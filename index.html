@@ -10,11 +10,10 @@
             --cyber-blue: #00f2ff;
             --cyber-pink: #ff0055;
             --wa-indigo: rgba(13, 27, 42, 0.95);
-            --bg-black: #050505;
         }
 
         body, html {
-            margin: 0; padding: 0; width: 100%; height: 100vh; height: 100dvh; 
+            margin: 0; padding: 0; width: 100%; height: 100dvh; 
             background-color: #000; color: #ffffff;
             font-family: "Sawarabi Mincho", serif;
             display: flex; justify-content: center; align-items: center;
@@ -23,18 +22,51 @@
 
         #game-container {
             position: relative; width: 100%; max-width: 500px; height: 100%;
-            background-color: var(--bg-black); display: none; flex-direction: column; box-sizing: border-box;
+            background-color: #050505; display: none; flex-direction: column; box-sizing: border-box;
         }
 
-        /* 🔈 ミュートボタンのデザイン */
-        #mute-btn {
-            position: absolute; top: 15px; right: 15px; z-index: 20;
-            background: rgba(0, 0, 0, 0.4); border: 1px solid var(--cyber-blue);
-            color: var(--cyber-blue); padding: 8px; cursor: pointer; border-radius: 5px;
-            font-size: 1.2rem; display: flex; align-items: center; justify-content: center;
-            width: 40px; height: 40px;
+        /* 📱 メニューエリア（位置を下げて視認性アップ） */
+        #menu-bar {
+            position: absolute; 
+            top: 45px; /* 10pxから45pxに下げて、スマホの時計等との重なりを回避 */
+            left: 0; right: 0; 
+            z-index: 999;
+            display: flex; 
+            gap: 8px; 
+            justify-content: flex-end;
+            padding: 0 15px;
         }
 
+        .menu-btn {
+            background: rgba(0, 20, 40, 0.9); 
+            border: 1px solid var(--cyber-blue);
+            color: var(--cyber-blue); 
+            padding: 8px 12px; 
+            cursor: pointer;
+            font-size: 0.7rem; 
+            font-weight: bold;
+            border-radius: 4px;
+            box-shadow: 0 0 10px rgba(0, 242, 255, 0.4);
+            font-family: sans-serif;
+        }
+
+        /* セーブ完了時のアニメーション */
+        .save-flash {
+            background: var(--cyber-blue) !important;
+            color: #000 !important;
+            transition: 0.3s;
+        }
+
+        /* 📜 バックログ画面 */
+        #log-screen {
+            position: absolute; inset: 0; background: rgba(0, 0, 0, 0.95);
+            z-index: 1000; display: none; flex-direction: column; padding: 40px 20px;
+        }
+        #log-content { flex: 1; overflow-y: auto; margin-bottom: 20px; font-size: 0.9rem; line-height: 1.8; }
+        .log-item { margin-bottom: 15px; border-bottom: 1px solid rgba(0, 242, 255, 0.2); padding-bottom: 8px; }
+        .log-name { color: var(--cyber-blue); font-weight: bold; }
+
+        /* 🖼️ 背景・キャラ */
         #bg-area {
             flex: 1; width: 100%;
             background-image: url('img/haikei01.png'); 
@@ -42,54 +74,25 @@
             position: relative; overflow: hidden;
             transition: background-image 0.5s ease-in-out;
         }
-
-        .chara-stand {
-            position: absolute; z-index: 2; display: none; 
-            filter: drop-shadow(0 0 15px rgba(0,0,0,0.8)); pointer-events: none;
-        }
-
+        .chara-stand { position: absolute; z-index: 2; display: none; filter: drop-shadow(0 0 15px #000); pointer-events: none; }
         .human-stand { height: 82%; bottom: -5px; left: 50%; transform: translateX(-50%); }
+        .mascot-stand { height: 35%; bottom: 12%; left: auto; right: 25px; transform: none; }
 
-        .mascot-stand { 
-            height: 35%; bottom: 5px; left: auto; right: 25px; transform: none; 
-        }
-
+        /* 💬 メッセージ窓 */
         #msg-window {
             height: 32%; width: 100%; background: var(--wa-indigo); border-top: 2px solid var(--cyber-blue);
             padding: 20px 25px calc(25px + env(safe-area-inset-bottom)); 
             box-sizing: border-box; cursor: pointer; z-index: 5; position: relative; display: none;
         }
-
-        #speaker-name {
-            font-size: 1.1rem; color: var(--cyber-blue); margin-bottom: 8px; font-weight: bold;
-            position: relative; padding-left: 22px; height: 1.5em;
-        }
-
-        #speaker-name::before {
-            content: "▷"; position: absolute; left: 0; top: 50%;
-            transform: translateY(-50%); text-shadow: 0 0 10px var(--cyber-blue);
-        }
-
+        #speaker-name { font-size: 1.1rem; color: var(--cyber-blue); margin-bottom: 8px; font-weight: bold; padding-left: 22px; position: relative; }
+        #speaker-name::before { content: "▷"; position: absolute; left: 0; top: 50%; transform: translateY(-50%); text-shadow: 0 0 10px var(--cyber-blue); }
         #message-text { font-size: 1rem; line-height: 1.6; letter-spacing: 0.05em; white-space: pre-wrap; }
 
-        .overlay-screen {
-            position: absolute; inset: 0; display: flex; flex-direction: column; 
-            justify-content: center; align-items: center; z-index: 100; 
-            background: radial-gradient(circle, #0d1b2a, #000); padding: 20px;
-        }
-
-        .pw-input {
-            background: rgba(0, 242, 255, 0.1); border: 1px solid var(--cyber-blue);
-            color: #fff; padding: 12px; font-size: 1.2rem; text-align: center;
-            margin-bottom: 20px; width: 80%; outline: none; border-radius: 0;
-        }
-
+        /* 🚪 画面遷移用 */
+        .overlay-screen { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100; background: radial-gradient(circle, #0d1b2a, #000); padding: 20px; }
+        .pw-input { background: rgba(0, 242, 255, 0.1); border: 1px solid var(--cyber-blue); color: #fff; padding: 12px; font-size: 1.2rem; text-align: center; margin-bottom: 20px; width: 80%; outline: none; }
         h1 { font-size: 2rem; text-shadow: 0 0 15px var(--cyber-blue); margin-bottom: 30px; text-align: center; }
-        .btn-cyber { 
-            padding: 12px 35px; font-size: 1.1rem; background: transparent; 
-            color: var(--cyber-blue); border: 1px solid var(--cyber-blue); 
-            cursor: pointer; clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%); 
-        }
+        .btn-cyber { padding: 12px 35px; font-size: 1.1rem; background: transparent; color: var(--cyber-blue); border: 1px solid var(--cyber-blue); cursor: pointer; clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%); }
 
         .flash-red { animation: flash 0.3s ease-out; }
         @keyframes flash { 0% { background-color: rgba(255, 0, 0, 0.6); } 100% { background-color: transparent; } }
@@ -106,11 +109,22 @@
 </div>
 
 <div id="game-container">
-    <button id="mute-btn" onclick="toggleMute()">🔊</button>
+    <div id="menu-bar">
+        <button class="menu-btn" onclick="openLog()">LOG</button>
+        <button class="menu-btn" id="save-btn" onclick="manualSave()">SAVE</button>
+        <button class="menu-btn" id="mute-btn" onclick="toggleMute()">🔊</button>
+        <button class="menu-btn" onclick="resetGame()">RESET</button>
+    </div>
+
+    <div id="log-screen">
+        <h2 style="color: var(--cyber-blue); border-bottom: 1px solid; margin-bottom: 20px;">BACK LOG</h2>
+        <div id="log-content"></div>
+        <button class="btn-cyber" onclick="closeLog()">CLOSE</button>
+    </div>
 
     <div id="title-screen" class="overlay-screen">
         <h1>音の足跡、<br>記憶の鼓動</h1>
-        <button class="btn-cyber" onclick="startGame()">START</button>
+        <button class="btn-cyber" id="start-btn" onclick="startGame()">START</button>
     </div>
 
     <div id="bg-area">
@@ -129,37 +143,10 @@
 <script>
     const SECRET_KEY = "2026"; 
     const bgm = document.getElementById('bgm');
-
-    function checkPassword() {
-        if (document.getElementById('pw-field').value === SECRET_KEY) {
-            document.getElementById('password-screen').style.display = 'none';
-            document.getElementById('game-container').style.display = 'flex';
-        } else {
-            alert("認証エラー");
-        }
-    }
-
-    // 🎵 ミュート切り替え
-    function toggleMute() {
-        const btn = document.getElementById('mute-btn');
-        if (bgm.muted) {
-            bgm.muted = false;
-            btn.innerText = "🔊";
-        } else {
-            bgm.muted = true;
-            btn.innerText = "🔇";
-        }
-    }
-
-    function startGame() {
-        document.getElementById('title-screen').style.display = 'none';
-        document.getElementById('msg-window').style.display = 'block';
-        
-        // 🎵 スタート時に再生
-        bgm.play().catch(e => console.log("再生に失敗しました（ブラウザ制限など）: ", e));
-        
-        showText();
-    }
+    let currentStep = 0;
+    let isTyping = false;
+    let typingTimer;
+    let chatHistory = []; 
 
     const scenario = [
         { name: "ハルト", text: "「……OSAKA。ネオンの海と、牙を剥くようなテック（技術）がひしめき合う、僕の街」", chara: "none", bg: "haikei01", effect: "none" },
@@ -182,21 +169,80 @@
         { name: "ハルト", text: "「待てよ！ 返せ！ 泥棒！！ \n……あ、あいつ、メインバッテリーを外したまま連れてった……。\nGPSの信号が消える前に、早く追いかけないと！」", chara: "haruto", bg: "bg_haruto_room", effect: "none" }
     ];
 
-    let currentStep = 0;
-    let isTyping = false;
-    let typingTimer;
+    function checkPassword() {
+        if (document.getElementById('pw-field').value === SECRET_KEY) {
+            document.getElementById('password-screen').style.display = 'none';
+            document.getElementById('game-container').style.display = 'flex';
+            loadGame(); 
+        } else { alert("認証エラー"); }
+    }
+
+    function startGame() {
+        document.getElementById('title-screen').style.display = 'none';
+        document.getElementById('msg-window').style.display = 'block';
+        bgm.play().catch(e => {});
+        showText();
+    }
+
+    function saveGame() {
+        const saveData = { step: currentStep, history: chatHistory, muted: bgm.muted };
+        localStorage.setItem('cyber_puzzle_save', JSON.stringify(saveData));
+    }
+
+    function manualSave() {
+        saveGame();
+        const btn = document.getElementById('save-btn');
+        btn.innerText = "SAVED!";
+        btn.classList.add('save-flash');
+        setTimeout(() => {
+            btn.innerText = "SAVE";
+            btn.classList.remove('save-flash');
+        }, 1000);
+    }
+
+    function loadGame() {
+        const saved = localStorage.getItem('cyber_puzzle_save');
+        if (saved) {
+            const data = JSON.parse(saved);
+            currentStep = data.step;
+            chatHistory = data.history || [];
+            bgm.muted = data.muted;
+            document.getElementById('mute-btn').innerText = bgm.muted ? "🔇" : "🔊";
+            document.getElementById('start-btn').innerText = "CONTINUE";
+        }
+    }
+
+    function resetGame() {
+        if (confirm("セーブデータを削除して最初からやり直しますか？")) {
+            localStorage.removeItem('cyber_puzzle_save');
+            location.reload();
+        }
+    }
+
+    function openLog() {
+        const logContent = document.getElementById('log-content');
+        logContent.innerHTML = chatHistory.map(h => `
+            <div class="log-item">
+                <div class="log-name">${h.name}</div>
+                <div class="log-text">${h.text}</div>
+            </div>
+        `).join('');
+        document.getElementById('log-screen').style.display = 'flex';
+    }
+    function closeLog() { document.getElementById('log-screen').style.display = 'none'; }
 
     function showText() {
         const data = scenario[currentStep];
         const nameEl = document.getElementById('speaker-name');
         const textEl = document.getElementById('message-text');
         const displayName = (data.name === "システム") ? "" : data.name;
-        
+        chatHistory.push({ name: data.name, text: data.text });
         nameEl.innerText = displayName;
         nameEl.style.display = displayName ? "block" : "none";
         textEl.innerText = "";
         isTyping = true;
         updateVisuals(data);
+        saveGame(); 
 
         let i = 0;
         clearInterval(typingTimer);
@@ -204,10 +250,7 @@
             if (i < data.text.length) {
                 textEl.innerText += data.text.charAt(i);
                 i++;
-            } else {
-                clearInterval(typingTimer);
-                isTyping = false;
-            }
+            } else { clearInterval(typingTimer); isTyping = false; }
         }, 40);
     }
 
@@ -217,21 +260,12 @@
         const kImg = document.getElementById('kage-stand');
         const dImg = document.getElementById('kodou-stand');
         const effectLayer = document.getElementById('effect-layer');
-
-        hImg.style.display = "none";
-        kImg.style.display = "none";
-        dImg.style.display = "none";
-
+        hImg.style.display = "none"; kImg.style.display = "none"; dImg.style.display = "none";
         if (data.chara === "haruto") hImg.style.display = "block";
         else if (data.chara === "kage") kImg.style.display = "block";
         else if (data.chara === "kodou") dImg.style.display = "block";
-        else if (data.chara === "haruto_kodou") {
-            hImg.style.display = "block";
-            dImg.style.display = "block";
-        }
-
+        else if (data.chara === "haruto_kodou") { hImg.style.display = "block"; dImg.style.display = "block"; }
         if (data.bg) bgArea.style.backgroundImage = `url('img/${data.bg}.png')`;
-
         if (data.effect === "error") {
             effectLayer.classList.add('flash-red');
             setTimeout(() => effectLayer.classList.remove('flash-red'), 300);
@@ -248,6 +282,13 @@
         currentStep++;
         if (currentStep < scenario.length) showText();
         else document.getElementById('message-text').innerText = "【第1章・冒頭 完】";
+    }
+
+    function toggleMute() {
+        const btn = document.getElementById('mute-btn');
+        bgm.muted = !bgm.muted;
+        btn.innerText = bgm.muted ? "🔇" : "🔊";
+        saveGame();
     }
 </script>
 
