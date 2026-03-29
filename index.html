@@ -3,115 +3,147 @@
 <head>
     <meta name="robots" content="noindex,nofollow">
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>音の足跡、記憶の鼓動 - Chapter 1</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>音の足跡、記憶の鼓動</title>
     <style>
-        /* --- CSS: デザイン設定 --- */
         :root {
             --cyber-blue: #00f2ff;
             --cyber-pink: #ff0055;
-            --wa-indigo: rgba(13, 27, 42, 0.9);
-            /* 👇発光エフェクト用の少し濃い水色を追加 */
-            --cyber-blue-glow: rgba(0, 242, 255, 0.7); 
+            --wa-indigo: rgba(13, 27, 42, 0.95);
+            --bg-black: #050505;
         }
 
         body, html {
             margin: 0; padding: 0; width: 100%; height: 100%;
-            background-color: #050505; color: #ffffff;
-            font-family: "Sawarabi Mincho", "Hiragino Mincho ProN", serif;
+            background-color: #000; color: #ffffff;
+            font-family: "Sawarabi Mincho", serif;
+            display: flex; justify-content: center; align-items: center;
             overflow: hidden;
         }
 
-        /* --- パスワード画面 --- */
-        #password-screen {
-            position: absolute; inset: 0;
-            background: radial-gradient(circle, #0d1b2a, #000);
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            z-index: 100;
+        /* 📱 スマホ風コンテナ（縦長固定） */
+        #game-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px; /* PCで見てもスマホサイズに制限 */
+            height: 100%;
+            background-color: var(--bg-black);
+            display: none; /* パスワード認証後に表示 */
+            flex-direction: column;
+            border-left: 1px solid #333;
+            border-right: 1px solid #333;
+            box-sizing: border-box;
         }
 
-        .pw-label {
-            font-size: 0.9rem; color: var(--cyber-blue);
-            letter-spacing: 0.3em; margin-bottom: 15px;
+        /* 背景・キャラエリア（画面の上半分以上を使用） */
+        #bg-area {
+            flex: 1; /* 残りのスペースをすべて使う */
+            width: 100%;
+            background-image: url('img/bg_haruto_room.png'); 
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 立ち絵：縦長画面に合わせて調整 */
+        .chara-stand {
+            position: absolute;
+            bottom: -5%; /* 少し下に沈めて安定させる */
+            left: 50%;
+            transform: translateX(-50%);
+            height: 85%; /* 縦長なので少し高さを抑える */
+            z-index: 2;
+            display: none;
+            filter: drop-shadow(0 0 15px rgba(0,0,0,0.8));
+            pointer-events: none;
+        }
+
+        /* メッセージウィンドウ（下部に固定） */
+        #msg-window {
+            height: 35%; /* スマホで読みやすいよう高めに確保 */
+            width: 100%;
+            background: var(--wa-indigo);
+            border-top: 2px solid var(--cyber-blue);
+            padding: 20px;
+            box-sizing: border-box;
+            cursor: pointer;
+            z-index: 5;
+            position: relative;
+            display: none;
+        }
+
+        /* スタイリッシュなマーク（復活版） */
+        #speaker-name {
+            font-size: 1.1rem;
+            color: var(--cyber-blue);
+            margin-bottom: 8px;
+            font-weight: bold;
+            position: relative;
+            padding-left: 22px;
+        }
+
+        #speaker-name::before {
+            content: "▷";
+            position: absolute;
+            left: 0; top: 50%;
+            transform: translateY(-50%);
             text-shadow: 0 0 10px var(--cyber-blue);
         }
 
+        #message-text {
+            font-size: 1.05rem;
+            line-height: 1.7;
+            letter-spacing: 0.05em;
+            white-space: pre-wrap;
+        }
+
+        /* パスワード・タイトル共通 */
+        .overlay-screen {
+            position: absolute; inset: 0;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 100; background: radial-gradient(circle, #0d1b2a, #000);
+            padding: 20px; text-align: center;
+        }
+
         .pw-input {
-            background: rgba(0, 242, 255, 0.1); 
-            border: 1px solid var(--cyber-blue);
+            background: rgba(0, 242, 255, 0.1); border: 1px solid var(--cyber-blue);
             color: #fff; padding: 12px; font-size: 1.2rem; text-align: center;
-            margin-bottom: 25px; outline: none; width: 200px;
-            box-shadow: 0 0 10px rgba(0, 242, 255, 0.2);
+            margin-bottom: 20px; width: 80%; outline: none;
         }
 
-        /* --- ゲーム画面 --- */
-        #game-container { position: relative; width: 100%; height: 100vh; display: none; flex-direction: column; }
-        #bg-area { height: 70%; width: 100%; background-image: url('img/bg_haruto_room.png'); background-size: cover; background-position: center; position: relative; overflow: hidden; }
-        .chara-stand { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); height: 90%; z-index: 2; display: none; filter: drop-shadow(0 0 15px var(--wa-indigo)); }
-        #msg-window { height: 30%; width: 100%; background: var(--wa-indigo); border-top: 3px solid var(--cyber-blue); padding: 30px 50px; box-sizing: border-box; cursor: pointer; z-index: 5; position: relative; }
-        
-        #speaker-name { 
-            font-size: 1.3rem; 
-            color: var(--cyber-blue); 
-            margin-bottom: 10px; 
-            font-weight: bold; 
-            height: 1.5em; 
-            position: relative;
-            /* 👇マーク分の余白を左に確保 */
-            padding-left: 25px; 
-        }
-
-        /* 👇マーク：スタイリッシュなネオン三角形を復活 */
-        #speaker-name::before {
-            content: "▷"; /* シャープな三角形 */
-            position: absolute;
-            left: 0;
-            top: 50%;
-            transform: translateY(-50%); /* 上下中央 */
-            font-size: 1.1rem;
-            color: var(--cyber-blue);
-            /* 👇ネオン発光エフェクト */
-            text-shadow: 
-                0 0 5px var(--cyber-blue),
-                0 0 10px var(--cyber-blue),
-                0 0 15px var(--cyber-blue-glow);
-            font-weight: normal;
-        }
-
-        #message-text { font-size: 1.2rem; line-height: 1.8; letter-spacing: 0.08em; white-space: pre-wrap; }
-        #title-screen { position: absolute; inset: 0; background: radial-gradient(circle, #1b262c, #0f4c75, #000); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10; }
-        h1 { font-size: 3rem; text-shadow: 0 0 20px var(--cyber-blue); margin-bottom: 40px; text-align: center; letter-spacing: 0.2em; }
+        h1 { font-size: 2.2rem; text-shadow: 0 0 15px var(--cyber-blue); margin-bottom: 30px; letter-spacing: 0.2em; }
         
         .btn-cyber { 
-            padding: 15px 40px; font-size: 1.2rem; background: transparent; 
-            color: var(--cyber-blue); border: 2px solid var(--cyber-blue); 
-            cursor: pointer; transition: 0.3s;
-            clip-path: polygon(15% 0, 100% 0, 85% 100%, 0% 100%); 
+            padding: 12px 30px; font-size: 1.1rem; background: transparent; 
+            color: var(--cyber-blue); border: 1px solid var(--cyber-blue); 
+            cursor: pointer; clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%); 
         }
-        .btn-cyber:hover { background: var(--cyber-blue); color: #000; box-shadow: 0 0 20px var(--cyber-blue); }
 
-        .flash-red { animation: flash 0.4s ease-out; }
-        @keyframes flash { 0% { background-color: rgba(255, 0, 0, 0.9); } 100% { background-color: transparent; } }
+        .flash-red { animation: flash 0.3s ease-out; }
+        @keyframes flash { 0% { background-color: rgba(255, 0, 0, 0.7); } 100% { background-color: transparent; } }
     </style>
 </head>
 <body>
 
-<div id="password-screen">
-    <p class="pw-label">ACCESS CODE REQUIRED</p>
-    <input type="password" id="pw-field" class="pw-input" placeholder="****">
-    <button class="btn-cyber" onclick="checkPassword()">AUTHENTICATE</button>
+<div id="password-screen" class="overlay-screen">
+    <p style="letter-spacing: 0.2em; font-size: 0.8rem; color: var(--cyber-blue);">DEVICE AUTHENTICATION</p>
+    <input type="password" id="pw-field" class="pw-input" placeholder="PASSCODE">
+    <button class="btn-cyber" onclick="checkPassword()">ENTER</button>
 </div>
 
 <div id="game-container">
-    <div id="title-screen">
+    <div id="title-screen" class="overlay-screen">
         <h1>音の足跡、<br>記憶の鼓動</h1>
         <button class="btn-cyber" onclick="startGame()">START</button>
     </div>
+
     <div id="bg-area">
         <div id="effect-layer" style="position:absolute; inset:0; pointer-events:none; z-index:3;"></div>
         <img id="haruto-stand" class="chara-stand" src="img/haruto01.png" alt="Haruto">
         <img id="kage-stand" class="chara-stand" src="img/kage01.png" alt="Kage">
     </div>
+
     <div id="msg-window" onclick="nextScene()">
         <div id="speaker-name"></div>
         <div id="message-text"></div>
@@ -119,32 +151,24 @@
 </div>
 
 <script>
-    // 🔑 パスワード設定
     const SECRET_KEY = "2026"; 
 
     function checkPassword() {
-        const input = document.getElementById('pw-field').value;
-        if (input === SECRET_KEY) {
+        if (document.getElementById('pw-field').value === SECRET_KEY) {
             document.getElementById('password-screen').style.display = 'none';
             document.getElementById('game-container').style.display = 'flex';
         } else {
-            alert("CODE ERROR: アクセス権限がありません。");
+            alert("ERROR: 認証に失敗しました");
         }
     }
 
-    // Enterキーでも認証できるように設定
-    document.getElementById('pw-field').addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') checkPassword();
-    });
-
-    // --- ゲーム本編 ---
     const scenario = [
         { name: "ハルト", text: "「……よし。父さんのマニュアル通りなら、これで処理速度が上がるはずだ。……いけっ！」", chara: "haruto", effect: "none" },
         { name: "システム", text: "（画面フラッシュ ＆ エラーSE音演出）", chara: "none", effect: "error" },
         { name: "ハルト", text: "「え……？ コドウ……？ 嘘だろ、待ってよ……！ \nごめん、僕が余計なことを……っ！」", chara: "haruto", effect: "none" },
         { name: "ハルト", text: "「 嘘だろ、待ってよ……！ \nごめん、僕が余計なことを……っ！」", chara: "haruto", effect: "none" },
         { name: "システム", text: "（カゲの立ち絵が登場）", chara: "none", effect: "none" },
-        { name: "ハルト", text: "`誰だ！？ コドウに触るな！」", chara: "haruto", effect: "none" },
+        { name: "ハルト", text: "「誰だ！？ コドウに触るな！」", chara: "haruto", effect: "none" },
         { name: "カゲ", text: "「……静かにしてくれ。……急がなければ。」", chara: "kage", effect: "none" },
         { name: "システム", text: "（カゲが消える）", chara: "none", effect: "none" },
         { name: "ハルト", text: "「待てよ！ 返せ！ 泥棒！！ \n……あ、あいつ、メインバッテリーを外したまま連れてった……。\nGPSの信号が消える前に、早く追いかけないと！」", chara: "haruto", effect: "none" }
@@ -164,23 +188,16 @@
         const data = scenario[currentStep];
         const nameEl = document.getElementById('speaker-name');
         const textEl = document.getElementById('message-text');
-        
-        // 名前を表示する。システムの場合は空。
         const displayName = (data.name === "システム") ? "" : data.name;
+        
         nameEl.innerText = displayName;
-
-        // 👇システムメッセージ（名前がない）の時は、マークも隠す
-        if (displayName === "") {
-            nameEl.style.display = "none";
-        } else {
-            nameEl.style.display = "block";
-        }
-
+        nameEl.style.display = displayName ? "block" : "none";
         textEl.innerText = "";
         isTyping = true;
-        applyStepSetup(data);
+
+        updateVisuals(data);
+
         let i = 0;
-        const speed = 40; 
         clearInterval(typingTimer);
         typingTimer = setInterval(() => {
             if (i < data.text.length) {
@@ -190,20 +207,16 @@
                 clearInterval(typingTimer);
                 isTyping = false;
             }
-        }, speed);
+        }, 4000 / data.text.length > 50 ? 50 : 30);
     }
 
-    function applyStepSetup(stepData) {
-        const harutoImg = document.getElementById('haruto-stand');
-        const kageImg = document.getElementById('kage-stand');
-        const effectLayer = document.getElementById('effect-layer');
-        harutoImg.style.display = "none";
-        kageImg.style.display = "none";
-        if (stepData.chara === "haruto") harutoImg.style.display = "block";
-        else if (stepData.chara === "kage") kageImg.style.display = "block";
-        if (stepData.effect === "error") {
-            effectLayer.classList.add('flash-red');
-            setTimeout(() => effectLayer.classList.remove('flash-red'), 400);
+    function updateVisuals(data) {
+        document.getElementById('haruto-stand').style.display = (data.chara === "haruto") ? "block" : "none";
+        document.getElementById('kage-stand').style.display = (data.chara === "kage") ? "block" : "none";
+        if (data.effect === "error") {
+            const layer = document.getElementById('effect-layer');
+            layer.classList.add('flash-red');
+            setTimeout(() => layer.classList.remove('flash-red'), 300);
         }
     }
 
@@ -216,12 +229,7 @@
         }
         currentStep++;
         if (currentStep < scenario.length) showText();
-        else {
-             // 終了時に立ち絵を消す処理を追加
-            document.getElementById('haruto-stand').style.display = "none";
-            document.getElementById('kage-stand').style.display = "none";
-            document.getElementById('message-text').innerText = "【第1章・冒頭 完】";
-        }
+        else document.getElementById('message-text').innerText = "【第1章・冒頭 完】";
     }
 </script>
 
