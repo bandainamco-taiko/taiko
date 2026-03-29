@@ -14,108 +14,77 @@
         }
 
         body, html {
-            margin: 0; padding: 0;
-            width: 100%;
-            /* 👇スマホのメニューバーを除いた100%の高さに固定 */
-            height: 100vh;
-            height: 100dvh; 
+            margin: 0; padding: 0; width: 100%; height: 100vh; height: 100dvh; 
             background-color: #000; color: #ffffff;
             font-family: "Sawarabi Mincho", serif;
             display: flex; justify-content: center; align-items: center;
-            overflow: hidden; /* 全体のスクロールを禁止 */
+            overflow: hidden; touch-action: none;
         }
 
-        /* 📱 スマホ風コンテナ */
         #game-container {
-            position: relative;
-            width: 100%;
-            max-width: 500px;
-            height: 100%;
-            background-color: var(--bg-black);
-            display: none;
-            flex-direction: column;
-            box-sizing: border-box;
+            position: relative; width: 100%; max-width: 500px; height: 100%;
+            background-color: var(--bg-black); display: none; flex-direction: column; box-sizing: border-box;
         }
 
-        /* 背景・キャラエリア */
+        /* 🔈 ミュートボタンのデザイン */
+        #mute-btn {
+            position: absolute; top: 15px; right: 15px; z-index: 20;
+            background: rgba(0, 0, 0, 0.4); border: 1px solid var(--cyber-blue);
+            color: var(--cyber-blue); padding: 8px; cursor: pointer; border-radius: 5px;
+            font-size: 1.2rem; display: flex; align-items: center; justify-content: center;
+            width: 40px; height: 40px;
+        }
+
         #bg-area {
-            flex: 1; /* メッセージ窓以外のスペースをすべて使う */
-            width: 100%;
-            background-image: url('img/bg_haruto_room.png'); 
-            background-size: cover;
-            background-position: center;
-            position: relative;
-            overflow: hidden;
+            flex: 1; width: 100%;
+            background-image: url('img/haikei01.png'); 
+            background-size: cover; background-position: center;
+            position: relative; overflow: hidden;
+            transition: background-image 0.5s ease-in-out;
         }
 
         .chara-stand {
-            position: absolute;
-            bottom: -2%;
-            left: 50%;
-            transform: translateX(-50%);
-            height: 80%; /* 縦長画面でキャラが切れすぎないよう調整 */
-            z-index: 2;
-            display: none;
-            filter: drop-shadow(0 0 15px rgba(0,0,0,0.8));
-            pointer-events: none;
+            position: absolute; z-index: 2; display: none; 
+            filter: drop-shadow(0 0 15px rgba(0,0,0,0.8)); pointer-events: none;
         }
 
-        /* メッセージウィンドウ（下部固定・高さ調整） */
+        .human-stand { height: 82%; bottom: -5px; left: 50%; transform: translateX(-50%); }
+
+        .mascot-stand { 
+            height: 35%; bottom: 5px; left: auto; right: 25px; transform: none; 
+        }
+
         #msg-window {
-            height: 30%; /* 高さを少し抑えてバランス調整 */
-            width: 100%;
-            background: var(--wa-indigo);
-            border-top: 2px solid var(--cyber-blue);
-            /* 👇下の余白を増やして、スマホのバーとの重なりを防止 */
-            padding: 20px 25px calc(20px + env(safe-area-inset-bottom)); 
-            box-sizing: border-box;
-            cursor: pointer;
-            z-index: 5;
-            position: relative;
-            display: none;
+            height: 32%; width: 100%; background: var(--wa-indigo); border-top: 2px solid var(--cyber-blue);
+            padding: 20px 25px calc(25px + env(safe-area-inset-bottom)); 
+            box-sizing: border-box; cursor: pointer; z-index: 5; position: relative; display: none;
         }
 
         #speaker-name {
-            font-size: 1.1rem;
-            color: var(--cyber-blue);
-            margin-bottom: 8px;
-            font-weight: bold;
-            position: relative;
-            padding-left: 22px;
+            font-size: 1.1rem; color: var(--cyber-blue); margin-bottom: 8px; font-weight: bold;
+            position: relative; padding-left: 22px; height: 1.5em;
         }
 
         #speaker-name::before {
-            content: "▷";
-            position: absolute;
-            left: 0; top: 50%;
-            transform: translateY(-50%);
-            text-shadow: 0 0 10px var(--cyber-blue);
+            content: "▷"; position: absolute; left: 0; top: 50%;
+            transform: translateY(-50%); text-shadow: 0 0 10px var(--cyber-blue);
         }
 
-        #message-text {
-            font-size: 1rem;
-            line-height: 1.6;
-            letter-spacing: 0.05em;
-            white-space: pre-wrap;
-        }
+        #message-text { font-size: 1rem; line-height: 1.6; letter-spacing: 0.05em; white-space: pre-wrap; }
 
-        /* パスワード・タイトル共通 */
         .overlay-screen {
-            position: absolute; inset: 0;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            z-index: 100; background: radial-gradient(circle, #0d1b2a, #000);
-            padding: 20px;
+            position: absolute; inset: 0; display: flex; flex-direction: column; 
+            justify-content: center; align-items: center; z-index: 100; 
+            background: radial-gradient(circle, #0d1b2a, #000); padding: 20px;
         }
 
         .pw-input {
             background: rgba(0, 242, 255, 0.1); border: 1px solid var(--cyber-blue);
             color: #fff; padding: 12px; font-size: 1.2rem; text-align: center;
-            margin-bottom: 20px; width: 80%; outline: none;
-            -webkit-appearance: none; /* iOSでの標準スタイルを無効化 */
+            margin-bottom: 20px; width: 80%; outline: none; border-radius: 0;
         }
 
         h1 { font-size: 2rem; text-shadow: 0 0 15px var(--cyber-blue); margin-bottom: 30px; text-align: center; }
-        
         .btn-cyber { 
             padding: 12px 35px; font-size: 1.1rem; background: transparent; 
             color: var(--cyber-blue); border: 1px solid var(--cyber-blue); 
@@ -128,6 +97,8 @@
 </head>
 <body>
 
+<audio id="bgm" src="music/intro.mp3" loop></audio>
+
 <div id="password-screen" class="overlay-screen">
     <p style="letter-spacing: 0.2em; font-size: 0.8rem; color: var(--cyber-blue); margin-bottom:10px;">SYSTEM CHECK</p>
     <input type="password" id="pw-field" class="pw-input" placeholder="PASSCODE">
@@ -135,6 +106,8 @@
 </div>
 
 <div id="game-container">
+    <button id="mute-btn" onclick="toggleMute()">🔊</button>
+
     <div id="title-screen" class="overlay-screen">
         <h1>音の足跡、<br>記憶の鼓動</h1>
         <button class="btn-cyber" onclick="startGame()">START</button>
@@ -142,8 +115,9 @@
 
     <div id="bg-area">
         <div id="effect-layer" style="position:absolute; inset:0; pointer-events:none; z-index:3;"></div>
-        <img id="haruto-stand" class="chara-stand" src="img/haruto01.png" alt="Haruto">
-        <img id="kage-stand" class="chara-stand" src="img/kage01.png" alt="Kage">
+        <img id="haruto-stand" class="chara-stand human-stand" src="img/haruto01.png" alt="Haruto">
+        <img id="kage-stand" class="chara-stand human-stand" src="img/kage01.png" alt="Kage">
+        <img id="kodou-stand" class="chara-stand mascot-stand" src="img/kodou01.png" alt="Kodou">
     </div>
 
     <div id="msg-window" onclick="nextScene()">
@@ -154,6 +128,7 @@
 
 <script>
     const SECRET_KEY = "2026"; 
+    const bgm = document.getElementById('bgm');
 
     function checkPassword() {
         if (document.getElementById('pw-field').value === SECRET_KEY) {
@@ -164,27 +139,52 @@
         }
     }
 
+    // 🎵 ミュート切り替え
+    function toggleMute() {
+        const btn = document.getElementById('mute-btn');
+        if (bgm.muted) {
+            bgm.muted = false;
+            btn.innerText = "🔊";
+        } else {
+            bgm.muted = true;
+            btn.innerText = "🔇";
+        }
+    }
+
+    function startGame() {
+        document.getElementById('title-screen').style.display = 'none';
+        document.getElementById('msg-window').style.display = 'block';
+        
+        // 🎵 スタート時に再生
+        bgm.play().catch(e => console.log("再生に失敗しました（ブラウザ制限など）: ", e));
+        
+        showText();
+    }
+
     const scenario = [
-        { name: "ハルト", text: "「……よし。父さんのマニュアル通りなら、これで処理速度が上がるはずだ。……いけっ！」", chara: "haruto", effect: "none" },
-        { name: "システム", text: "（画面フラッシュ ＆ エラーSE音演出）", chara: "none", effect: "error" },
-        { name: "ハルト", text: "「え……？ コドウ……？ 嘘だろ、待ってよ……！」", chara: "haruto", effect: "none" },
-        { name: "ハルト", text: "「ごめん、僕が余計なことを……っ！」", chara: "haruto", effect: "none" },
-        { name: "システム", text: "（カゲの立ち絵が登場）", chara: "none", effect: "none" },
-        { name: "ハルト", text: "「誰だ！？ コドウに触るな！」", chara: "haruto", effect: "none" },
-        { name: "正体不明の男", text: "「……静かにしてくれ。……急がなければ。」", chara: "kage", effect: "none" },
-        { name: "システム", text: "（正体不明の男が消える）", chara: "none", effect: "none" },
-        { name: "ハルト", text: "「待てよ！ 返せ！ 泥棒！！ \n……あ、あいつ、メインバッテリーを外したまま連れてった……。\nGPSの信号が消える前に、早く追いかけないと！」", chara: "haruto", effect: "none" }
+        { name: "ハルト", text: "「……OSAKA。ネオンの海と、牙を剥くようなテック（技術）がひしめき合う、僕の街」", chara: "none", bg: "haikei01", effect: "none" },
+        { name: "システム", text: "（画面、街の雑踏と、和楽器の音が混ざり合う独特な喧騒を映し出す）", chara: "none", bg: "haikei01", effect: "none" },
+        { name: "ハルト", text: "「ここでは、誰もが『最強の音』を求めている。魂を揺さぶるリズム、世界を変える周波数。……でも、僕が求めているのは、もっと別のものだ」", chara: "haruto", bg: "haikei01", effect: "none" },
+        { name: "システム", text: "（ハルト、隣に浮かぶコドウを、愛おしそうに見つめる）", chara: "haruto_kodou", bg: "haikei01", effect: "none" },
+        { name: "ハルト", text: "「こいつは『コドウ』。……お父さんが、宇宙へ行く前に僕にくれた、特別な相棒」", chara: "haruto_kodou", bg: "haikei01", effect: "none" },
+        { name: "コドウ", text: "「（和風な電子音で）ドン！ ハルト、今日の調子はどう？」", chara: "kodou", bg: "haikei01", effect: "none" },
+        { name: "ハルト", text: "「（フッと笑う）絶好調だよ、コドウ。……お父さんが帰ってくるまでに、お前を世界一のロボットにして、びっくりさせてやるんだ」", chara: "haruto_kodou", bg: "haikei01", effect: "none" },
+        { name: "システム", text: "（ハルト、ヘッドホンを装着し、端末を取り出す）", chara: "haruto", bg: "haikei01", effect: "none" },
+        { name: "ハルト", text: "「さあ、始めよう。……僕たちの、新しいリズムを創り出す、特別なメンテナンスを」", chara: "haruto_kodou", bg: "haikei01", effect: "none" },
+        { name: "ハルト", text: "「……よし。父さんのマニュアル通りなら、これで処理速度が上がるはずだ。……いけっ！」", chara: "haruto_kodou", bg: "bg_haruto_room", effect: "none" },
+        { name: "システム", text: "（画面フラッシュ ＆ エラーSE音演出）", chara: "none", bg: "bg_haruto_room", effect: "error" },
+        { name: "ハルト", text: "「え……？ コドウ……？ 嘘だろ、待ってよ……！」", chara: "haruto", bg: "bg_haruto_room", effect: "none" },
+        { name: "ハルト", text: "「ごめん、僕が余計なことを……っ！」", chara: "haruto", bg: "bg_haruto_room", effect: "none" },
+        { name: "システム", text: "（カゲの立ち絵が登場）", chara: "none", bg: "bg_haruto_room", effect: "none" },
+        { name: "ハルト", text: "「誰だ！？ コドウに触るな！」", chara: "haruto", bg: "bg_haruto_room", effect: "none" },
+        { name: "正体不明の男", text: "「……静かにしてくれ。……急がなければ。」", chara: "kage", bg: "bg_haruto_room", effect: "none" },
+        { name: "システム", text: "（正体不明の男が消える）", chara: "none", bg: "bg_haruto_room", effect: "none" },
+        { name: "ハルト", text: "「待てよ！ 返せ！ 泥棒！！ \n……あ、あいつ、メインバッテリーを外したまま連れてった……。\nGPSの信号が消える前に、早く追いかけないと！」", chara: "haruto", bg: "bg_haruto_room", effect: "none" }
     ];
 
     let currentStep = 0;
     let isTyping = false;
     let typingTimer;
-
-    function startGame() {
-        document.getElementById('title-screen').style.display = 'none';
-        document.getElementById('msg-window').style.display = 'block';
-        showText();
-    }
 
     function showText() {
         const data = scenario[currentStep];
@@ -212,12 +212,29 @@
     }
 
     function updateVisuals(data) {
-        document.getElementById('haruto-stand').style.display = (data.chara === "haruto") ? "block" : "none";
-        document.getElementById('kage-stand').style.display = (data.chara === "kage") ? "block" : "none";
+        const bgArea = document.getElementById('bg-area');
+        const hImg = document.getElementById('haruto-stand');
+        const kImg = document.getElementById('kage-stand');
+        const dImg = document.getElementById('kodou-stand');
+        const effectLayer = document.getElementById('effect-layer');
+
+        hImg.style.display = "none";
+        kImg.style.display = "none";
+        dImg.style.display = "none";
+
+        if (data.chara === "haruto") hImg.style.display = "block";
+        else if (data.chara === "kage") kImg.style.display = "block";
+        else if (data.chara === "kodou") dImg.style.display = "block";
+        else if (data.chara === "haruto_kodou") {
+            hImg.style.display = "block";
+            dImg.style.display = "block";
+        }
+
+        if (data.bg) bgArea.style.backgroundImage = `url('img/${data.bg}.png')`;
+
         if (data.effect === "error") {
-            const layer = document.getElementById('effect-layer');
-            layer.classList.add('flash-red');
-            setTimeout(() => layer.classList.remove('flash-red'), 300);
+            effectLayer.classList.add('flash-red');
+            setTimeout(() => effectLayer.classList.remove('flash-red'), 300);
         }
     }
 
