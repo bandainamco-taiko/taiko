@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta name="robots" content="noindex,nofollow">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>音の足跡、記憶の鼓動</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sawarabi+Mincho&display=swap" rel="stylesheet">
     <style>
         :root {
             --cyber-blue: #00f2ff;
@@ -12,33 +12,43 @@
         }
 
         body, html {
-            margin: 0; padding: 0; width: 100%; height: 100dvh; 
+            margin: 0; padding: 0; width: 100%; height: 100vh; height: 100dvh; 
             background-color: #000; color: #ffffff;
-            font-family: "Sawarabi Mincho", serif;
+            font-family: 'Sawarabi Mincho', serif;
             display: flex; justify-content: center; align-items: center;
-            overflow: hidden; touch-action: none;
+            overflow: hidden; 
+            overscroll-behavior: none; /* 画面のバウンス防止 */
+            touch-action: none;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none; -webkit-user-select: none;
         }
 
         #game-container {
             position: relative; width: 100%; max-width: 500px; height: 100%;
-            background-color: #050505; display: none; flex-direction: column; box-sizing: border-box;
+            background-color: #050505; display: none; flex-direction: column; 
+            box-sizing: border-box; overflow: hidden;
         }
 
         #menu-bar {
-            position: absolute; top: 45px; left: 0; right: 0; z-index: 6000;
-            display: flex; gap: 8px; justify-content: flex-end; padding: 0 15px;
+            position: absolute; 
+            top: env(safe-area-inset-top, 20px); 
+            padding-top: 10px;
+            left: 0; right: 0; z-index: 6000;
+            display: flex; gap: 8px; justify-content: flex-end; padding-right: 15px;
+            pointer-events: none;
         }
         .menu-btn {
+            pointer-events: auto;
             background: rgba(0, 20, 40, 0.9); border: 1px solid var(--cyber-blue);
             color: var(--cyber-blue); padding: 8px 12px; cursor: pointer;
             font-size: 0.7rem; font-weight: bold; border-radius: 4px;
-            box-shadow: 0 0 10px rgba(0, 242, 255, 0.4); font-family: sans-serif;
+            box-shadow: 0 0 10px rgba(0, 242, 255, 0.4);
         }
 
         #fader {
             position: absolute; inset: 0; background: #000; 
-            z-index: 5000; opacity: 0; pointer-events: none;
-            transition: opacity 2s ease;
+            z-index: 8000; opacity: 0; pointer-events: none;
+            transition: opacity 1.5s ease-in-out;
         }
         #fader.active { opacity: 1; pointer-events: auto; }
 
@@ -47,17 +57,10 @@
             background: #000; justify-content: center; align-items: center;
         }
         #ending-video { width: 100%; height: 100%; object-fit: cover; }
-        #ending-img { 
-            position: absolute; inset: 0; display: none; background-size: cover; 
-            background-repeat: no-repeat; background-position: center;
-            background-color: #000; cursor: pointer;
-            opacity: 0; transition: opacity 2s ease;
-        }
 
         #bg-area {
             flex: 1; width: 100%; background-image: url('img/haikei01.png'); 
             background-size: cover; background-position: center; position: relative; overflow: hidden;
-            transition: background-image 0.5s ease-in-out;
         }
         .chara-stand { position: absolute; z-index: 2; display: none; filter: drop-shadow(0 0 15px #000); pointer-events: none; }
         .human-stand { height: 82%; bottom: -5px; left: 50%; transform: translateX(-50%); }
@@ -65,43 +68,42 @@
 
         #msg-window {
             height: 32%; width: 100%; background: var(--wa-indigo); border-top: 2px solid var(--cyber-blue);
-            padding: 20px 25px calc(25px + env(safe-area-inset-bottom)); 
+            padding: 20px 25px calc(25px + env(safe-area-inset-bottom, 20px)); 
             box-sizing: border-box; cursor: pointer; z-index: 5; position: relative; display: none;
         }
         #message-text { font-size: 1rem; line-height: 1.6; letter-spacing: 0.05em; white-space: pre-wrap; }
 
         .overlay-screen { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100; background: radial-gradient(circle, #0d1b2a, #000); padding: 20px; }
-        .pw-input { background: rgba(0, 242, 255, 0.1); border: 1px solid var(--cyber-blue); color: #fff; padding: 12px; font-size: 1.2rem; text-align: center; margin-bottom: 20px; width: 80%; outline: none; }
-        h1 { font-size: 2rem; text-shadow: 0 0 15px var(--cyber-blue); margin-bottom: 30px; text-align: center; }
+        .pw-input { background: rgba(0, 242, 255, 0.1); border: 1px solid var(--cyber-blue); color: #fff; padding: 12px; font-size: 1.2rem; text-align: center; margin-bottom: 20px; width: 80%; outline: none; border-radius: 0; -webkit-appearance: none; }
+        h1 { font-size: 1.8rem; text-shadow: 0 0 15px var(--cyber-blue); margin-bottom: 30px; text-align: center; line-height: 1.4; }
         .btn-cyber { padding: 12px 35px; font-size: 1.1rem; background: transparent; color: var(--cyber-blue); border: 1px solid var(--cyber-blue); cursor: pointer; clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%); }
 
         .flash-red { animation: flash 0.3s ease-out; }
         @keyframes flash { 0% { background-color: rgba(255, 0, 0, 0.6); } 100% { background-color: transparent; } }
 
         #log-screen {
-            position: absolute; inset: 0; background: rgba(0, 0, 0, 0.95);
-            z-index: 7000; display: none; flex-direction: column; padding: 40px 20px;
+            position: absolute; inset: 0; background: rgba(0, 0, 0, 0.98);
+            z-index: 9000; display: none; flex-direction: column; padding: 60px 20px 40px;
         }
-        #log-content { flex: 1; overflow-y: auto; margin-bottom: 20px; font-size: 0.9rem; line-height: 1.8; }
+        #log-content { flex: 1; overflow-y: auto; margin-bottom: 20px; font-size: 0.9rem; line-height: 1.8; -webkit-overflow-scrolling: touch; }
         .log-item { margin-bottom: 15px; border-bottom: 1px solid rgba(0, 242, 255, 0.2); padding-bottom: 8px; }
         .log-name { color: var(--cyber-blue); font-weight: bold; }
     </style>
 </head>
 <body>
 
-<audio id="bgm" src="music/intro.mp3" loop></audio>
+<audio id="bgm" src="music/intro.mp3" loop preload="auto"></audio>
 <div id="fader"></div>
 
 <div id="password-screen" class="overlay-screen">
-    <p style="letter-spacing: 0.2em; font-size: 0.8rem; color: var(--cyber-blue); margin-bottom:10px;">SYSTEM CHECK</p>
-    <input type="password" id="pw-field" class="pw-input" placeholder="PASSCODE">
+    <p style="letter-spacing: 0.2em; font-size: 0.7rem; color: var(--cyber-blue); margin-bottom:10px;">SYSTEM STATUS: ENCRYPTED</p>
+    <input type="password" id="pw-field" class="pw-input" placeholder="PASSCODE" inputmode="numeric">
     <button class="btn-cyber" onclick="checkPassword()">認証</button>
 </div>
 
 <div id="game-container">
     <div id="video-layer">
-        <video id="ending-video" src="img/opening.mp4" playsinline></video>
-        <div id="ending-img" onclick="goToNextChapter()" style="background-image: url('img/opening01.png');"></div>
+        <video id="ending-video" src="img/opening.mp4" playsinline webkit-playsinline preload="auto"></video>
     </div>
 
     <div id="menu-bar">
@@ -112,7 +114,7 @@
     </div>
 
     <div id="log-screen">
-        <h2 style="color: var(--cyber-blue); border-bottom: 1px solid; margin-bottom: 20px;">BACK LOG</h2>
+        <h2 style="color: var(--cyber-blue); border-bottom: 1px solid; margin-bottom: 20px; font-size: 1.2rem;">BACK LOG</h2>
         <div id="log-content"></div>
         <button class="btn-cyber" onclick="closeLog()">CLOSE</button>
     </div>
@@ -141,10 +143,10 @@
     const fader = document.getElementById('fader');
     const videoLayer = document.getElementById('video-layer');
     const endingVideo = document.getElementById('ending-video');
-    const endingImg = document.getElementById('ending-img');
 
     let currentStep = 0;
     let isTyping = false;
+    let isTransitioning = false; // 二重呼び出し防止
     let typingTimer;
     let chatHistory = []; 
 
@@ -152,7 +154,7 @@
         { name: "ハルト", text: "「……OSAKA。ネオンの海と、牙を剥くようなテック（技術）がひしめき合う、僕の街」", chara: "none", bg: "haikei01", effect: "none" },
         { name: "システム", text: "（画面、街の雑踏と、和楽器の音が混ざり合う独特な喧騒を映し出す）", chara: "none", bg: "haikei01", effect: "none" },
         { name: "ハルト", text: "「ここでは、誰もが『最強の音』を求めている。魂を揺さぶるリズム、世界を変える周波数。……でも、僕が求めているのは、もっと別のものだ」", chara: "haruto", bg: "haikei01", effect: "none" },
-        { name: "システム", text: "（ハルト、隣に浮かぶコドウを、愛おしそうに見つめる）", chara: "haruto_kodou", bg: "haikei01", effect: "none" },
+        { name: "システム", text: "（ハルト、隣に浮かぶコドウを、愛おしそうに観つめる）", chara: "haruto_kodou", bg: "haikei01", effect: "none" },
         { name: "ハルト", text: "「こいつは『コドウ』。……お父さんが、宇宙へ行く前に僕にくれた、特別な相棒」", chara: "haruto_kodou", bg: "haikei01", effect: "none" },
         { name: "コドウ", text: "「（和風な電子音で）ドン！ ハルト、今日の調子はどう？」", chara: "kodou", bg: "haikei01", effect: "none" },
         { name: "ハルト", text: "「（フッと笑う）絶好調だよ、コドウ。……お父さんが帰ってくるまでに、お前を世界一のロボットにして、びっくりさせてやるんだ」", chara: "haruto_kodou", bg: "haikei01", effect: "none" },
@@ -166,7 +168,7 @@
         { name: "ハルト", text: "「誰だ！？ コドウに触るな！」", chara: "haruto", bg: "bg_haruto_room", effect: "none" },
         { name: "正体不明の男", text: "「……静かにしてくれ。……急がなければ。」", chara: "kage", bg: "bg_haruto_room", effect: "none" },
         { name: "システム", text: "（正体不明の男が消える）", chara: "none", bg: "bg_haruto_room", effect: "none" },
-        { name: "ハルト", text: "「待てよ！ 返せ！ 泥棒！！ \n……あ, あいつ、メインバッテリーを外したまま連れてった……。\nGPSの信号が消える前に, 早く追いかけないと！」", chara: "haruto", bg: "bg_haruto_room", effect: "none" }
+        { name: "ハルト", text: "「待てよ！ 返せ！ 泥棒！！ \n……あ、あいつ、メインバッテリーを外したまま連れてった……。\nGPSの信号が消える前に、早く追いかけないと！」", chara: "haruto", bg: "bg_haruto_room", effect: "none" }
     ];
 
     function checkPassword() {
@@ -180,98 +182,97 @@
     function startGame() {
         document.getElementById('title-screen').style.display = 'none';
         document.getElementById('msg-window').style.display = 'block';
-        bgm.volume = 1.0;
-        bgm.play().catch(e => {});
+        bgm.volume = 1.0; 
+        bgm.play().catch(e => { console.log("Audio play blocked"); });
         showText();
     }
 
     function fadeOutBGM(callback) {
-        const fadeOutInterval = 50;
-        const fadeOutDuration = 1500; // 少し早めに
-        const step = 1 / (fadeOutDuration / fadeOutInterval);
-        let fadeTimer = setInterval(() => {
-            if (bgm.volume > step) {
-                bgm.volume -= step;
-            } else {
-                bgm.volume = 0;
-                bgm.pause();
-                clearInterval(fadeTimer);
+        const interval = 50;
+        const step = 0.05; 
+        let timer = setInterval(() => {
+            if (bgm.volume > step) bgm.volume -= step;
+            else {
+                bgm.volume = 0; bgm.pause(); clearInterval(timer);
                 if (callback) callback();
             }
-        }, fadeOutInterval);
+        }, interval);
     }
 
     function playOpeningVideo() {
-        // スマホ対策：タップ直後にまず再生（まだ見せない）
-        endingVideo.volume = 0;
-        const playPromise = endingVideo.play();
+        if (isTransitioning) return;
+        isTransitioning = true;
 
-        fadeOutBGM(() => {
-            fader.classList.add('active'); 
-            setTimeout(() => {
-                videoLayer.style.display = 'flex';
-                endingVideo.style.display = 'block';
-                endingVideo.volume = 1.0; // 音を戻す
-                fader.classList.remove('active'); 
-            }, 2000);
+        endingVideo.muted = true;
+        endingVideo.play().then(() => {
+            fader.classList.add('active');
+            fadeOutBGM(() => {
+                setTimeout(() => {
+                    videoLayer.style.display = 'flex';
+                    videoLayer.style.opacity = '1';
+                    endingVideo.muted = false;
+                    endingVideo.currentTime = 0;
+                    fader.classList.remove('active');
+                }, 1000);
+            });
+        }).catch(e => {
+            console.log("Video restriction", e);
+            showEndingImage();
         });
 
         endingVideo.onended = () => {
-            fader.classList.add('active'); 
+            fader.classList.add('active');
             setTimeout(() => {
-                endingVideo.style.display = 'none';
-                endingImg.style.display = 'block';
-                setTimeout(() => {
-                    fader.classList.remove('active'); 
-                    endingImg.style.opacity = '1';
-                }, 1000); 
-            }, 2000);
+                videoLayer.style.display = 'none';
+                showEndingImage();
+            }, 1500);
         };
     }
 
-    function goToNextChapter() {
-        alert("つづく... 第2章、近日公開！");
+    function showEndingImage() {
+        const endLayer = document.createElement('div');
+        endLayer.style.cssText = "position:absolute; inset:0; z-index:4500; background-color:#000; display:flex; justify-content:center; align-items:center;";
+        const endImg = document.createElement('div');
+        endImg.style.cssText = "width:100%; height:100%; background-image:url('img/opening01.png'); background-size:cover; background-position:center; cursor:pointer; opacity:0; transition:opacity 2.5s ease-in-out;";
+        
+        endImg.onclick = () => {
+            bgm.volume = 1.0;
+            alert("つづく... 第2章、近日公開！");
+        };
+
+        endLayer.appendChild(endImg);
+        document.getElementById('game-container').appendChild(endLayer);
+        setTimeout(() => {
+            fader.classList.remove('active');
+            endImg.style.opacity = '1';
+        }, 800);
     }
 
     function saveGame() {
-        const saveData = { step: currentStep, history: chatHistory, muted: bgm.muted };
-        localStorage.setItem('cyber_puzzle_save', JSON.stringify(saveData));
-    }
-
-    function manualSave() {
-        saveGame();
-        const btn = document.getElementById('save-btn');
-        btn.innerText = "SAVED!"; btn.classList.add('save-flash');
-        setTimeout(() => { btn.innerText = "SAVE"; btn.classList.remove('save-flash'); }, 1000);
+        localStorage.setItem('cyber_puzzle_save', JSON.stringify({ 
+            step: currentStep, history: chatHistory, muted: bgm.muted 
+        }));
     }
 
     function loadGame() {
         const saved = localStorage.getItem('cyber_puzzle_save');
         if (saved) {
             const data = JSON.parse(saved);
-            currentStep = data.step;
-            chatHistory = data.history || [];
-            bgm.muted = data.muted;
-            document.getElementById('mute-btn').innerText = bgm.muted ? "🔇" : "🔊";
-            document.getElementById('start-btn').innerText = "CONTINUE";
+            if (data.step < scenario.length) {
+                currentStep = data.step;
+                chatHistory = data.history || [];
+                bgm.muted = data.muted;
+                document.getElementById('mute-btn').innerText = bgm.muted ? "🔇" : "🔊";
+                document.getElementById('start-btn').innerText = "CONTINUE";
+            }
         }
     }
 
-    function resetGame() {
-        if (confirm("セーブデータを削除して最初からやり直しますか？")) {
-            localStorage.removeItem('cyber_puzzle_save');
-            location.reload();
-        }
-    }
+    function resetGame() { if (confirm("最初からやり直しますか？")) { localStorage.removeItem('cyber_puzzle_save'); location.reload(); } }
 
     function openLog() {
         const logContent = document.getElementById('log-content');
-        logContent.innerHTML = chatHistory.map(h => `
-            <div class="log-item">
-                <div class="log-name">${h.name}</div>
-                <div class="log-text">${h.text}</div>
-            </div>
-        `).join('');
+        logContent.innerHTML = chatHistory.map(h => `<div class="log-item"><div class="log-name">${h.name}</div><div class="log-text">${h.text}</div></div>`).join('');
         document.getElementById('log-screen').style.display = 'flex';
     }
     function closeLog() { document.getElementById('log-screen').style.display = 'none'; }
@@ -283,26 +284,21 @@
         chatHistory.push({ name: data.name, text: data.text });
         nameEl.innerText = (data.name === "システム") ? "" : data.name;
         nameEl.style.display = (data.name === "システム") ? "none" : "block";
-        textEl.innerText = "";
-        isTyping = true;
-        updateVisuals(data);
-        saveGame(); 
+        textEl.innerText = ""; isTyping = true;
+        updateVisuals(data); saveGame();
 
-        let i = 0;
-        clearInterval(typingTimer);
+        let i = 0; clearInterval(typingTimer);
         typingTimer = setInterval(() => {
-            if (i < data.text.length) {
-                textEl.innerText += data.text.charAt(i);
-                i++;
-            } else { clearInterval(typingTimer); isTyping = false; }
+            if (i < data.text.length) { textEl.innerText += data.text.charAt(i); i++; }
+            else { clearInterval(typingTimer); isTyping = false; }
         }, 40);
     }
 
     function updateVisuals(data) {
-        const bgArea = document.getElementById('bg-area');
         const hImg = document.getElementById('haruto-stand');
         const kImg = document.getElementById('kage-stand');
         const dImg = document.getElementById('kodou-stand');
+        const bgArea = document.getElementById('bg-area');
         hImg.style.display = "none"; kImg.style.display = "none"; dImg.style.display = "none";
         if (data.chara === "haruto") hImg.style.display = "block";
         else if (data.chara === "kage") kImg.style.display = "block";
@@ -310,9 +306,9 @@
         else if (data.chara === "haruto_kodou") { hImg.style.display = "block"; dImg.style.display = "block"; }
         if (data.bg) bgArea.style.backgroundImage = `url('img/${data.bg}.png')`;
         if (data.effect === "error") {
-            const layer = document.getElementById('effect-layer');
-            layer.classList.add('flash-red');
-            setTimeout(() => layer.classList.remove('flash-red'), 300);
+            const el = document.getElementById('effect-layer');
+            el.classList.add('flash-red');
+            setTimeout(() => el.classList.remove('flash-red'), 300);
         }
     }
 
@@ -320,23 +316,14 @@
         if (isTyping) {
             clearInterval(typingTimer);
             document.getElementById('message-text').innerText = scenario[currentStep].text;
-            isTyping = false;
-            return;
+            isTyping = false; return;
         }
         currentStep++;
-        if (currentStep < scenario.length) {
-            showText();
-        } else {
-            // シナリオ終了のタップで「即座に」ビデオ再生を開始する
-            playOpeningVideo();
-        }
+        if (currentStep < scenario.length) showText();
+        else playOpeningVideo();
     }
 
-    function toggleMute() {
-        bgm.muted = !bgm.muted;
-        document.getElementById('mute-btn').innerText = bgm.muted ? "🔇" : "🔊";
-        saveGame();
-    }
+    function toggleMute() { bgm.muted = !bgm.muted; document.getElementById('mute-btn').innerText = bgm.muted ? "🔇" : "🔊"; saveGame(); }
 </script>
 
 </body>
