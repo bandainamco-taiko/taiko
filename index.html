@@ -24,10 +24,10 @@
             background-color: #050505; display: none; flex-direction: column; box-sizing: border-box;
         }
 
-        /* 📱 メニューエリア（最前面に配置） */
+        /* 📱 メニューエリア */
         #menu-bar {
             position: absolute; top: 45px; left: 0; right: 0; 
-            z-index: 6000; /* 全ての演出パネルより上に置く */
+            z-index: 6000;
             display: flex; gap: 8px; justify-content: flex-end; padding: 0 15px;
         }
         .menu-btn {
@@ -40,9 +40,7 @@
         /* 🎬 演出用：ブラックフェーダー */
         #fader {
             position: absolute; inset: 0; background: #000; 
-            z-index: 5000; /* メニューよりは下、ゲームよりは上 */
-            opacity: 0; 
-            pointer-events: none; /* 通常時はクリックを透過させる（重要！） */
+            z-index: 5000; opacity: 0; pointer-events: none;
             transition: opacity 2s ease;
         }
         #fader.active { opacity: 1; pointer-events: auto; }
@@ -55,12 +53,14 @@
         }
         #ending-video { 
             width: 100%; height: 100%; 
-            object-fit: contain; /* 横が切れずに全体を表示する設定 */
+            /* 👇上下を合わせ、左右を見切れさせる設定に変更 */
+            object-fit: cover; 
         }
         
         #ending-img { 
             position: absolute; inset: 0; display: none; 
-            background-size: contain; /* 画像も全体が見えるように */
+            /* 👇画像も画面いっぱいに表示 */
+            background-size: cover; 
             background-repeat: no-repeat; background-position: center;
             background-color: #000; cursor: pointer;
             opacity: 0; transition: opacity 2s ease;
@@ -92,7 +92,7 @@
         .flash-red { animation: flash 0.3s ease-out; }
         @keyframes flash { 0% { background-color: rgba(255, 0, 0, 0.6); } 100% { background-color: transparent; } }
         
-        /* 📜 ログ画面（最前面） */
+        /* 📜 ログ画面 */
         #log-screen {
             position: absolute; inset: 0; background: rgba(0, 0, 0, 0.95);
             z-index: 7000; display: none; flex-direction: column; padding: 40px 20px;
@@ -167,7 +167,7 @@
         { name: "ハルト", text: "「……OSAKA。ネオンの海と、牙を剥くようなテック（技術）がひしめき合う、僕の街」", chara: "none", bg: "haikei01", effect: "none" },
         { name: "システム", text: "（画面、街の雑踏と、和楽器の音が混ざり合う独特な喧騒を映し出す）", chara: "none", bg: "haikei01", effect: "none" },
         { name: "ハルト", text: "「ここでは、誰もが『最強の音』を求めている。魂を揺さぶるリズム、世界を変える周波数。……でも、僕が求めているのは、もっと別のものだ」", chara: "haruto", bg: "haikei01", effect: "none" },
-        { name: "システム", text: "（ハルト、隣に浮かぶコドウを、愛おしそうに見つめる）", chara: "haruto_kodou", bg: "haikei01", effect: "none" },
+        { name: "システム", text: "（ハルト、隣に浮かぶコドウを、愛おしそう見つめる）", chara: "haruto_kodou", bg: "haikei01", effect: "none" },
         { name: "ハルト", text: "「こいつは『コドウ』。……お父さんが、宇宙へ行く前に僕にくれた、特別な相棒」", chara: "haruto_kodou", bg: "haikei01", effect: "none" },
         { name: "コドウ", text: "「（和風な電子音で）ドン！ ハルト、今日の調子はどう？」", chara: "kodou", bg: "haikei01", effect: "none" },
         { name: "ハルト", text: "「（フッと笑う）絶好調だよ、コドウ。……お父さんが帰ってくるまでに、お前を世界一のロボットにして、びっくりさせてやるんだ」", chara: "haruto_kodou", bg: "haikei01", effect: "none" },
@@ -201,24 +201,24 @@
 
     function playOpeningVideo() {
         bgm.pause();
-        fader.classList.add('active'); // 暗転開始
+        fader.classList.add('active'); 
         
         setTimeout(() => {
             videoLayer.style.display = 'flex';
             endingVideo.style.display = 'block';
             endingImg.style.display = 'none';
             endingImg.style.opacity = '0';
-            fader.classList.remove('active'); // 明転して動画開始
+            fader.classList.remove('active'); 
             endingVideo.play();
         }, 2500);
 
         endingVideo.onended = () => {
-            fader.classList.add('active'); // 動画終わり暗転
+            fader.classList.add('active'); 
             setTimeout(() => {
                 endingVideo.style.display = 'none';
                 endingImg.style.display = 'block';
                 setTimeout(() => {
-                    fader.classList.remove('active'); // 1秒黒画面のあと明転
+                    fader.classList.remove('active'); 
                     endingImg.style.opacity = '1';
                 }, 1000); 
             }, 2000);
