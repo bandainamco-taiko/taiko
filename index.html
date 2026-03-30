@@ -100,7 +100,7 @@
 
 <div id="game-container">
     <div id="video-layer">
-        <video id="ending-video" src="img/opening.mp4" playsinline muted></video>
+        <video id="ending-video" src="img/opening.mp4" playsinline></video>
         <div id="ending-img" onclick="goToNextChapter()" style="background-image: url('img/opening01.png');"></div>
     </div>
 
@@ -166,7 +166,7 @@
         { name: "ハルト", text: "「誰だ！？ コドウに触るな！」", chara: "haruto", bg: "bg_haruto_room", effect: "none" },
         { name: "正体不明の男", text: "「……静かにしてくれ。……急がなければ。」", chara: "kage", bg: "bg_haruto_room", effect: "none" },
         { name: "システム", text: "（正体不明の男が消える）", chara: "none", bg: "bg_haruto_room", effect: "none" },
-        { name: "ハルト", text: "「待てよ！ 返せ！ 泥棒！！ \n……あ、あいつ、メインバッテリーを外したまま連れてった……。\nGPSの信号が消える前に、早く追いかけないと！」", chara: "haruto", bg: "bg_haruto_room", effect: "none" }
+        { name: "ハルト", text: "「待てよ！ 返せ！ 泥棒！！ \n……あ, あいつ、メインバッテリーを外したまま連れてった……。\nGPSの信号が消える前に, 早く追いかけないと！」", chara: "haruto", bg: "bg_haruto_room", effect: "none" }
     ];
 
     function checkPassword() {
@@ -187,13 +187,14 @@
 
     function fadeOutBGM(callback) {
         const fadeOutInterval = 50;
-        const fadeOutDuration = 1500;
+        const fadeOutDuration = 1500; // 少し早めに
         const step = 1 / (fadeOutDuration / fadeOutInterval);
         let fadeTimer = setInterval(() => {
             if (bgm.volume > step) {
                 bgm.volume -= step;
             } else {
-                bgm.volume = 0; bgm.pause();
+                bgm.volume = 0;
+                bgm.pause();
                 clearInterval(fadeTimer);
                 if (callback) callback();
             }
@@ -201,24 +202,17 @@
     }
 
     function playOpeningVideo() {
-        // 重要：タップした瞬間に動画の「再生許可」をブラウザからもらう
-        endingVideo.muted = true; // 一旦ミュートで再生開始
-        endingVideo.play().then(() => {
-            endingVideo.pause(); // 許可だけもらってすぐ一時停止
-            endingVideo.currentTime = 0;
-            endingVideo.muted = false; // ミュート解除（後で流すため）
-        }).catch(e => console.log("Video init failed: ", e));
+        // スマホ対策：タップ直後にまず再生（まだ見せない）
+        endingVideo.volume = 0;
+        const playPromise = endingVideo.play();
 
         fadeOutBGM(() => {
             fader.classList.add('active'); 
             setTimeout(() => {
                 videoLayer.style.display = 'flex';
                 endingVideo.style.display = 'block';
-                endingImg.style.display = 'none';
-                endingImg.style.opacity = '0';
+                endingVideo.volume = 1.0; // 音を戻す
                 fader.classList.remove('active'); 
-                // ここで本番再生
-                endingVideo.play();
             }, 2000);
         });
 
@@ -333,7 +327,7 @@
         if (currentStep < scenario.length) {
             showText();
         } else {
-            // 最後のセリフ（GPSの信号が～）の直後に実行
+            // シナリオ終了のタップで「即座に」ビデオ再生を開始する
             playOpeningVideo();
         }
     }
