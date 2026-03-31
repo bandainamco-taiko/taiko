@@ -17,7 +17,7 @@
             font-family: 'Sawarabi Mincho', serif;
             display: flex; justify-content: center; align-items: center;
             overflow: hidden; 
-            overscroll-behavior: none; /* 画面のバウンス防止 */
+            overscroll-behavior: none;
             touch-action: none;
             -webkit-tap-highlight-color: transparent;
             user-select: none; -webkit-user-select: none;
@@ -55,6 +55,7 @@
         #video-layer {
             position: absolute; inset: 0; z-index: 4000; display: none;
             background: #000; justify-content: center; align-items: center;
+            opacity: 0; transition: opacity 1s ease;
         }
         #ending-video { width: 100%; height: 100%; object-fit: cover; }
 
@@ -77,9 +78,6 @@
         .pw-input { background: rgba(0, 242, 255, 0.1); border: 1px solid var(--cyber-blue); color: #fff; padding: 12px; font-size: 1.2rem; text-align: center; margin-bottom: 20px; width: 80%; outline: none; border-radius: 0; -webkit-appearance: none; }
         h1 { font-size: 1.8rem; text-shadow: 0 0 15px var(--cyber-blue); margin-bottom: 30px; text-align: center; line-height: 1.4; }
         .btn-cyber { padding: 12px 35px; font-size: 1.1rem; background: transparent; color: var(--cyber-blue); border: 1px solid var(--cyber-blue); cursor: pointer; clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%); }
-
-        .flash-red { animation: flash 0.3s ease-out; }
-        @keyframes flash { 0% { background-color: rgba(255, 0, 0, 0.6); } 100% { background-color: transparent; } }
 
         #log-screen {
             position: absolute; inset: 0; background: rgba(0, 0, 0, 0.98);
@@ -146,12 +144,12 @@
 
     let currentStep = 0;
     let isTyping = false;
-    let isTransitioning = false; // 二重呼び出し防止
+    let isTransitioning = false; 
     let typingTimer;
     let chatHistory = []; 
 
     const scenario = [
-        { name: "ハルト", text: "「……OSAKA。ネオンの海と、牙を剥くようなテック（技術）がひしめき合う、僕の街」", chara: "none", bg: "haikei01", effect: "none" },
+        { name: "ハルト", text: "「……OSAKA1。ネオンの海と、牙を剥くようなテック（技術）がひしめき合う、僕の街」", chara: "none", bg: "haikei01", effect: "none" },
         { name: "システム", text: "（画面、街の雑踏と、和楽器の音が混ざり合う独特な喧騒を映し出す）", chara: "none", bg: "haikei01", effect: "none" },
         { name: "ハルト", text: "「ここでは、誰もが『最強の音』を求めている。魂を揺さぶるリズム、世界を変える周波数。……でも、僕が求めているのは、もっと別のものだ」", chara: "haruto", bg: "haikei01", effect: "none" },
         { name: "システム", text: "（ハルト、隣に浮かぶコドウを、愛おしそうに観つめる）", chara: "haruto_kodou", bg: "haikei01", effect: "none" },
@@ -183,42 +181,46 @@
         document.getElementById('title-screen').style.display = 'none';
         document.getElementById('msg-window').style.display = 'block';
         bgm.volume = 1.0; 
-        bgm.play().catch(e => { console.log("Audio play blocked"); });
+        bgm.play().catch(e => { console.log("Audio Play Blocked"); });
         showText();
     }
 
-    function fadeOutBGM(callback) {
-        const interval = 50;
-        const step = 0.05; 
-        let timer = setInterval(() => {
-            if (bgm.volume > step) bgm.volume -= step;
-            else {
-                bgm.volume = 0; bgm.pause(); clearInterval(timer);
-                if (callback) callback();
-            }
-        }, interval);
-    }
-
+    // 🚀 【強化】スマホ制限を突破する再生ロジック
     function playOpeningVideo() {
         if (isTransitioning) return;
         isTransitioning = true;
 
-        endingVideo.muted = true;
-        endingVideo.play().then(() => {
-            fader.classList.add('active');
-            fadeOutBGM(() => {
-                setTimeout(() => {
-                    videoLayer.style.display = 'flex';
-                    videoLayer.style.opacity = '1';
-                    endingVideo.muted = false;
-                    endingVideo.currentTime = 0;
-                    fader.classList.remove('active');
-                }, 1000);
+        // 【最優先】クリックした瞬間に動画の再生命令を出す
+        endingVideo.muted = true; // ミュートにすると自動再生成功率が100%に近づく
+        const playPromise = endingVideo.play();
+
+        if (playPromise !== undefined) {
+            playPromise.then(() => {
+                // 再生が成功した直後
+                fader.classList.add('active'); // 暗転開始
+                
+                // BGMを裏でゆっくり消す
+                let fadeTimer = setInterval(() => {
+                    if (bgm.volume > 0.1) bgm.volume -= 0.1;
+                    else {
+                        bgm.volume = 0; bgm.pause(); clearInterval(fadeTimer);
+                        
+                        // 暗転しきった頃に動画を表示
+                        setTimeout(() => {
+                            videoLayer.style.display = 'flex';
+                            videoLayer.style.opacity = '1';
+                            endingVideo.muted = false; // 音を戻す
+                            endingVideo.currentTime = 0;
+                            fader.classList.remove('active'); // 明転
+                        }, 500);
+                    }
+                }, 100);
+            }).catch(error => {
+                // 動画再生が失敗した場合の緊急回避（画像へ飛ばす）
+                console.log("Video playback failed: ", error);
+                showEndingImage();
             });
-        }).catch(e => {
-            console.log("Video restriction", e);
-            showEndingImage();
-        });
+        }
 
         endingVideo.onended = () => {
             fader.classList.add('active');
