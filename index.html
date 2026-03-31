@@ -24,7 +24,6 @@
             background-color: #050505; display: none; flex-direction: column; box-sizing: border-box;
         }
 
-        /* 📱 メニューエリア */
         #menu-bar {
             position: absolute; top: 45px; left: 0; right: 0; 
             z-index: 6000;
@@ -37,7 +36,6 @@
             box-shadow: 0 0 10px rgba(0, 242, 255, 0.4); font-family: sans-serif;
         }
 
-        /* 🎬 演出用：ブラックフェーダー */
         #fader {
             position: absolute; inset: 0; background: #000; 
             z-index: 5000; opacity: 0; pointer-events: none;
@@ -45,28 +43,19 @@
         }
         #fader.active { opacity: 1; pointer-events: auto; }
 
-        /* 🎥 ビデオ・エンド画像レイヤー */
         #video-layer {
             position: absolute; inset: 0; 
             z-index: 4000; display: none;
             background: #000; justify-content: center; align-items: center;
         }
-        #ending-video { 
-            width: 100%; height: 100%; 
-            /* 👇上下を合わせ、左右を見切れさせる設定に変更 */
-            object-fit: cover; 
-        }
-        
+        #ending-video { width: 100%; height: 100%; object-fit: cover; }
         #ending-img { 
             position: absolute; inset: 0; display: none; 
-            /* 👇画像も画面いっぱいに表示 */
-            background-size: cover; 
-            background-repeat: no-repeat; background-position: center;
+            background-size: cover; background-repeat: no-repeat; background-position: center;
             background-color: #000; cursor: pointer;
             opacity: 0; transition: opacity 2s ease;
         }
 
-        /* 🖼️ 背景・キャラ */
         #bg-area {
             flex: 1; width: 100%; background-image: url('img/haikei01.png'); 
             background-size: cover; background-position: center; position: relative; overflow: hidden;
@@ -76,7 +65,6 @@
         .human-stand { height: 82%; bottom: -5px; left: 50%; transform: translateX(-50%); }
         .mascot-stand { height: 35%; bottom: 12%; left: auto; right: 25px; transform: none; }
 
-        /* 💬 メッセージ窓 */
         #msg-window {
             height: 32%; width: 100%; background: var(--wa-indigo); border-top: 2px solid var(--cyber-blue);
             padding: 20px 25px calc(25px + env(safe-area-inset-bottom)); 
@@ -92,7 +80,6 @@
         .flash-red { animation: flash 0.3s ease-out; }
         @keyframes flash { 0% { background-color: rgba(255, 0, 0, 0.6); } 100% { background-color: transparent; } }
         
-        /* 📜 ログ画面 */
         #log-screen {
             position: absolute; inset: 0; background: rgba(0, 0, 0, 0.95);
             z-index: 7000; display: none; flex-direction: column; padding: 40px 20px;
@@ -164,6 +151,7 @@
     let chatHistory = []; 
 
     const scenario = [
+        // --- 第1章：導入 ---
         { name: "ハルト", text: "「……OSAKA。ネオンの海と、牙を剥くようなテック（技術）がひしめき合う、僕の街」", chara: "none", bg: "haikei01", effect: "none" },
         { name: "システム", text: "（画面、街の雑踏と、和楽器の音が混ざり合う独特な喧騒を映し出す）", chara: "none", bg: "haikei01", effect: "none" },
         { name: "ハルト", text: "「ここでは、誰もが『最強の音』を求めている。魂を揺さぶるリズム、世界を変える周波数。……でも、僕が求めているのは、もっと別のものだ」", chara: "haruto", bg: "haikei01", effect: "none" },
@@ -177,11 +165,56 @@
         { name: "システム", text: "（画面フラッシュ ＆ エラーSE音演出）", chara: "none", bg: "bg_haruto_room", effect: "error" },
         { name: "ハルト", text: "「え……？ コドウ……？ 嘘だろ、待ってよ……！」", chara: "haruto", bg: "bg_haruto_room", effect: "none" },
         { name: "ハルト", text: "「ごめん、僕が余計なことを……っ！」", chara: "haruto", bg: "bg_haruto_room", effect: "none" },
-        { name: "システム", text: "（カゲの立ち絵が登場）", chara: "none", bg: "bg_haruto_room", effect: "none" },
+        { name: "システム", text: "（静寂の中に、ノイズが混ざり始める）", chara: "kage", bg: "bg_haruto_room", effect: "none" },
+        { name: "謎の男", text: "「…………」", chara: "kage", bg: "bg_haruto_room", effect: "none" },
+        { name: "謎の男", text: "「……チッ、計算が甘かったか」", chara: "kage", bg: "bg_haruto_room", effect: "none" },
+        { name: "謎の男", text: "「……高出力ユニットの負荷テスト……コンマ05の誤差で、これほどのズレが出るとはな。『エネルギー変換効率』を過信しすぎたか。」", chara: "kage", bg: "bg_haruto_room", effect: "none" },
+        { name: "ハルト", text: "「誰だ！ おまえ、……さっきから何を言っているんだ」", chara: "haruto", bg: "bg_haruto_room", effect: "none" },
         { name: "ハルト", text: "「誰だ！？ コドウに触るな！」", chara: "haruto", bg: "bg_haruto_room", effect: "none" },
-        { name: "正体不明の男", text: "「……静かにしてくれ。……急がなければ。」", chara: "kage", bg: "bg_haruto_room", effect: "none" },
-        { name: "システム", text: "（正体不明の男が消える）", chara: "none", bg: "bg_haruto_room", effect: "none" },
-        { name: "ハルト", text: "「待てよ！ 返せ！ 泥棒！！ \n……あ、あいつ、メインバッテリーを外したまま連れてった……。\nGPSの信号が消える前に、早く追いかけないと！」", chara: "haruto", bg: "bg_haruto_room", effect: "none" }
+        { name: "謎の男", text: "「……静かにしてくれ。……急がなければ。」", chara: "kage", bg: "bg_haruto_room", effect: "none" },
+        { name: "システム", text: "（謎の男が消える）", chara: "none", bg: "bg_haruto_room", effect: "none" },
+        
+        // --- 追跡開始 〜 OSAKA中央駅 ---
+        { name: "ハルト", text: "「くそっ、GPSのロックが解除できない……。強力な軍事用プロトコルだ。……待てよ、お父さんの『開発ノート』なら……！」", chara: "haruto", bg: "bg_haruto_room", effect: "none" },
+        { name: "ハルト", text: "「（ノートをめくり、コードを入力する）……よし、通った！ コドウの信号をキャッチしたぞ。……『OSAKA中央駅』？ あいつ、駅へ向かってるのか！」", chara: "haruto", bg: "bg_haruto_room", effect: "none" },
+        { name: "システム", text: "（SE：駅の雑踏と、重厚なゲートが閉まる音）", chara: "none", bg: "bg_station", effect: "none" },
+        { name: "ハルト", text: "「ハァ、ハァ……！ やっと着いた……ここがOSAKA中央駅か。……って、ゲートが閉まった……！？ くそっ、あいつが強引に突破したせいで、セキュリティが……！」", chara: "haruto", bg: "bg_station", effect: "none" },
+        { name: "駅アナウンス", text: "『警告。不正アクセスを検知。システムを警戒モードへ移行します。復旧には管理パスワードが必要です』", chara: "none", bg: "bg_station", effect: "none" },
+        { name: "ハルト", text: "「（端末を操作して）GPSの信号が遠ざかっていく……。……待てよ、この速度、リニアの専用軌道に乗ったのか？ 進行方向は……北。……この先にあるのは、KYOTOか！」", chara: "haruto", bg: "bg_station", effect: "none" },
+        { name: "ハルト", text: "「……よし、やるしかない。父さんの残した『緊急解除コードのメモ』を解析するんだ！ 僕もリニアで追いかける！」", chara: "haruto", bg: "bg_station", effect: "none" },
+        
+        // --- 謎解きクリア 〜 リニア発進 ---
+        { name: "ハルト", text: "「……よし、承認された！ システムリブート！ いけ……動けッ！！」", chara: "haruto", bg: "bg_station", effect: "none" },
+        { name: "システム", text: "（SE：駆動音と共に画面が激しくフラッシュ）", chara: "none", bg: "bg_linear", effect: "error" },
+        { name: "駅アナウンス", text: "『管理コード承認。機体「ツルギ」、緊急発進シークエンスへ移行。目的地：KYOTO』", chara: "none", bg: "bg_linear", effect: "none" },
+        { name: "ハルト", text: "「（加速するリニアの窓の外を見つめ）やっぱり、目的地は京都だ。……待ってろよ、コドウ。必ず、僕が助け出すから」", chara: "haruto", bg: "bg_linear", effect: "none" },
+        { name: "ハルト", text: "「（京都駅に到着して）……ここが、KYOTO。OSAKAとは空気が違う。……この霧、ただの霧じゃない。ナノマシンのノイズだ。GPSが……ノイズで位置が特定できない！」", chara: "haruto", bg: "bg_kyoto_station", effect: "none" },
+        { name: "ハルト", text: "「（ノートの破片と聞き込みを照らし合わせる）……『八』と『万』……。分かったぞ、店の名前は『八百万（ヤオヨロズ）ジャンク』だ！ あの赤い鳥居のホログラムが目印だ！」", chara: "haruto", bg: "bg_kyoto_station", effect: "none" },
+
+        // --- 第2章：電脳街「八百万ジャンク」での対峙 ---
+        { name: "ハルト", text: "「はぁ、はぁ……捕まえたぞ。……さあ、コドウを返せ！ 今すぐだ！」", chara: "haruto", bg: "bg_cyber_shop", effect: "none" },
+        { name: "謎の男", text: "「（ゆっくりと振り返り）……悪いな。黙って連れてきて。……だが、こいつは預かっておく」", chara: "kage", bg: "bg_cyber_shop", effect: "none" },
+        { name: "ハルト", text: "「預かる！？ 勝手なことを言うな！ 僕の相棒だ、お前に触られる筋合いはない！」", chara: "haruto_kodou", bg: "bg_cyber_shop", effect: "none" },
+        { name: "謎の男", text: "「……ああ、その通りだ。本来なら、お前と直接接点を持つことは……『禁止』されている。……本来ならな」", chara: "kage", bg: "bg_cyber_shop", effect: "none" },
+        { name: "ハルト", text: "「禁止……？ 誰にだよ。お前、一体何者なんだ？」", chara: "haruto", bg: "bg_cyber_shop", effect: "none" },
+        { name: "謎の男", text: "「……今は言えない。ただ、お前との接触は、予定にはなかったんだ。……だが、運命のズレは既に始まっているらしい」", chara: "kage", bg: "bg_cyber_shop", effect: "none" },
+
+        // --- ヤタガラス襲来と警告 ---
+        { name: "警備ドローン", text: "『……目標発見。ハルト……ハルト・アマツを確認』", chara: "none", bg: "bg_cyber_shop", effect: "error" },
+        { name: "ハルト", text: "「っ！？ なんだこいつら……！？ なんで、なんで僕の名前を知ってるんだよ！」", chara: "haruto", bg: "bg_cyber_shop", effect: "none" },
+        { name: "ハルト", text: "「（カゲを見て）……そうか、お前たちの差し金か。……こいつらを使って、僕を待ち伏せしてたのか！」", chara: "haruto", bg: "bg_cyber_shop", effect: "none" },
+        { name: "謎の男", text: "「……そいつらは警備用の『ヤタガラス』だ。気をつけたほうがいいぜ。弾はゴム製だが、まともに食らえば骨の二、三本は覚悟しなきゃならない」", chara: "kage", bg: "bg_cyber_shop", effect: "none" },
+        { name: "ハルト", text: "「……っ、脅しのつもりかよ！ 自分の仲間の性能を自慢しに来たのか！？」", chara: "haruto", bg: "bg_cyber_shop", effect: "none" },
+        { name: "謎の男", text: "「……自慢じゃない。……事実を言ったまでだ」", chara: "kage", bg: "bg_cyber_shop", effect: "none" },
+
+        // --- 去り際の約束 ---
+        { name: "謎の男", text: "「……すまないが、まだ返せない。……こいつは連れていく」", chara: "kage", bg: "bg_cyber_shop", effect: "none" },
+        { name: "ハルト", text: "「待て！ 行かせるかよ！」", chara: "haruto", bg: "bg_cyber_shop", effect: "none" },
+        { name: "謎の男", text: "「……取り戻したければ、来い。……かつて、こいつ（コドウ）が生まれた、あの場所に」", chara: "kage", bg: "bg_cyber_shop", effect: "none" },
+        { name: "ハルト", text: "「……っ！？ 『生まれた場所』……？ 、どういうことだ！？」", chara: "haruto", bg: "bg_cyber_shop", effect: "none" },
+        { name: "謎の男", text: "「……詳しい場所は、そのノートを見れば思い出すはずだ。……そこで待っている」", chara: "kage", bg: "bg_cyber_shop", effect: "none" },
+        { name: "システム", text: "（謎の男が消える）", chara: "none", bg: "bg_cyber_shop", effect: "none" },
+        { name: "ハルト", text: "「（逃走する謎の男を見送りながら）……あいつ、ドローンを操ってやがった。やっぱり、最初から全部あいつの仕業だったんだ。……それにしても……あいつ、一体何が目的なんだ……？」", chara: "haruto", bg: "bg_cyber_shop", effect: "none" }
     ];
 
     function checkPassword() {
@@ -226,7 +259,7 @@
     }
 
     function goToNextChapter() {
-        alert("つづく... 第2章、近日公開！");
+        alert("つづく... 第3章、近日公開！");
     }
 
     function saveGame() {
@@ -273,6 +306,10 @@
     function closeLog() { document.getElementById('log-screen').style.display = 'none'; }
 
     function showText() {
+        if (currentStep >= scenario.length) {
+            playOpeningVideo();
+            return;
+        }
         const data = scenario[currentStep];
         const nameEl = document.getElementById('speaker-name');
         const textEl = document.getElementById('message-text');
@@ -320,8 +357,7 @@
             return;
         }
         currentStep++;
-        if (currentStep < scenario.length) showText();
-        else playOpeningVideo();
+        showText();
     }
 
     function toggleMute() {
