@@ -9,6 +9,7 @@
         :root {
             --cyber-blue: #00f2ff;
             --cyber-pink: #ff00ff;
+            --cyber-green: #00ffaa;
             --wa-indigo: rgba(13, 27, 42, 0.95);
         }
 
@@ -25,7 +26,6 @@
             background-color: #050505; display: none; flex-direction: column; box-sizing: border-box;
         }
 
-        /* 📱 メニューエリア */
         #menu-bar {
             position: absolute; top: 45px; left: 0; right: 0; 
             z-index: 6000; display: flex; gap: 5px; justify-content: flex-end; padding: 0 10px;
@@ -38,7 +38,6 @@
         }
         .btn-note { border-color: var(--cyber-pink); color: var(--cyber-pink); box-shadow: 0 0 10px rgba(255, 0, 255, 0.4); }
 
-        /* 🎬 演出用レイヤー */
         #fader { position: absolute; inset: 0; background: #000; z-index: 8000; opacity: 0; pointer-events: none; transition: opacity 2s ease; }
         #fader.active { opacity: 1; pointer-events: auto; }
 
@@ -51,13 +50,11 @@
             opacity: 0; transition: opacity 2s ease;
         }
 
-        /* 🖼️ 背景・キャラ */
         #bg-area { flex: 1; width: 100%; background-image: url('img/haikei01.png'); background-size: cover; background-position: center; position: relative; overflow: hidden; transition: background-image 0.5s ease-in-out; }
         .chara-stand { position: absolute; z-index: 2; display: none; filter: drop-shadow(0 0 15px #000); pointer-events: none; }
         .human-stand { height: 82%; bottom: -5px; left: 50%; transform: translateX(-50%); }
         .mascot-stand { height: 35%; bottom: 12%; left: auto; right: 25px; transform: none; }
 
-        /* 💬 メッセージ窓 */
         #msg-window {
             height: 32%; width: 100%; background: var(--wa-indigo); border-top: 2px solid var(--cyber-blue);
             padding: 20px 25px calc(25px + env(safe-area-inset-bottom)); box-sizing: border-box; cursor: pointer; z-index: 5; position: relative; display: none;
@@ -65,15 +62,16 @@
         #message-text { font-size: 1rem; line-height: 1.6; letter-spacing: 0.05em; white-space: pre-wrap; }
 
         .full-overlay { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.98); z-index: 9000; display: none; flex-direction: column; padding: 60px 25px 40px; }
-        #note-screen { border: 1px solid var(--cyber-pink); }
         .note-item { margin-bottom: 20px; padding: 15px; border: 1px solid rgba(255, 0, 255, 0.3); background: rgba(255, 0, 255, 0.05); border-radius: 5px; }
         .note-title { color: var(--cyber-pink); font-weight: bold; margin-bottom: 5px; font-size: 0.9rem; border-bottom: 1px solid var(--cyber-pink); }
         .note-body { font-size: 0.85rem; line-height: 1.6; color: #ddd; }
 
         .btn-cyber { padding: 12px 35px; font-size: 1.1rem; background: transparent; color: var(--cyber-blue); border: 1px solid var(--cyber-blue); cursor: pointer; clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%); }
         
-        .flash-red { animation: flash 0.3s ease-out; }
-        @keyframes flash { 0% { background-color: rgba(255, 0, 0, 0.6); } 100% { background-color: transparent; } }
+        .flash-red { animation: flash-red-anim 0.3s ease-out; }
+        @keyframes flash-red-anim { 0% { background-color: rgba(255, 0, 0, 0.6); } 100% { background-color: transparent; } }
+        .flash-green { animation: flash-green-anim 0.4s ease-out; }
+        @keyframes flash-green-anim { 0% { background-color: rgba(0, 255, 170, 0.7); } 100% { background-color: transparent; } }
     </style>
 </head>
 <body>
@@ -96,7 +94,6 @@
     <div id="menu-bar">
         <button class="menu-btn btn-note" onclick="openNote()">📓 NOTE</button>
         <button class="menu-btn" onclick="openLog()">LOG</button>
-        <button class="menu-btn" id="save-btn" onclick="manualSave()">SAVE</button>
         <button class="menu-btn" id="mute-btn" onclick="toggleMute()">🔊</button>
         <button class="menu-btn" onclick="resetGame()">RESET</button>
     </div>
@@ -146,25 +143,60 @@
     let unlockedNotes = [];
 
     const scenario = [
-        { name: "ハルト", text: "「……OSAKA。ネオンの海と、牙を剥くようなテック（技術）がひしめき合う、僕の街」", chara: "none", bg: "haikei01" },
-        { name: "ハルト", text: "「こいつは『コドウ』。……お父さんが、宇宙へ行く前に僕にくれた、特別な相棒」", chara: "haruto_kodou", bg: "haikei01" },
+        // --- 第1章：導入 ---
+        { name: "ハルト", text: "「……OSAKA。ネオンの海と、牙をむくような技術がひしめき合う、僕の街」", chara: "none", bg: "haikei01" },
+        { name: "ハルト", text: "「こいつは『コドウ』。AIとロボットテクノロジーの第一人者であるお父さんが、宇宙へ行く前に僕にくれた、特別な相棒」", chara: "haruto_kodou", bg: "haikei01" },
+        { name: "コドウ", text: "「（和風な電子音で）ドン！ ハルト、今日の調子はどう？」", chara: "kodou", bg: "haikei01" },
+        { name: "システム", text: "（ハルト、ヘッドホンを装着し、メンテナンスを開始する）", chara: "haruto_kodou", bg: "bg_haruto_room" },
         { name: "システム", text: "（画面フラッシュ ＆ エラーSE音演出）", chara: "none", bg: "bg_haruto_room", effect: "error" },
-        { name: "謎の男", text: "「……高出力ユニットの負荷テスト……コンマ05の誤差で、これほどのズレが出るとはな。『エネルギー変換効率』を過信しすぎたか。」", chara: "kage", bg: "bg_haruto_room" },
-        { name: "システム", text: "（謎の男が窓から消え、ハルトは空になったデスクを見つめる）", chara: "none", bg: "bg_haruto_room" },
-        { name: "ハルト", text: "「（ノートをパラパラとめくる）……落ち着け。お父さんのことだ。……絶対に、僕でも辿り着けるように『鍵』を隠してるはずだ。……これだ！」", chara: "haruto", bg: "bg_haruto_room", note: { id: "n0", title: "父の開発ノート", body: "コドウに内蔵された軍事用GPS。そのロックを解除する鍵がノートに隠されていた。" } },
-        { name: "ハルト", text: "「……よし、通った！ コドウの信号をキャッチしたぞ。……『OSAKA中央駅』？ あいつ、駅へ向かってるのか！」", chara: "haruto", bg: "bg_haruto_room" },
-        { name: "駅アナウンス", text: "『警告。不正アクセスを検知。復旧には管理パスワードが必要です』", chara: "none", bg: "bg_station" },
-        { name: "ハルト", text: "「……よし、承認された！ システムリブート！ いけ……動けッ！！」", chara: "haruto", bg: "bg_station" },
-        { name: "システム", text: "（SE：駆動音と共に画面が激しくフラッシュ）", chara: "none", bg: "bg_linear", effect: "error" },
-        { name: "ハルト", text: "「やっぱり、目的地は京都だ。……待ってろよ、コドウ。必ず、僕が助け出すから」", chara: "haruto", bg: "bg_linear", videoTrigger: true },
+        { name: "ハルト", text: "「え……？ コドウ……？ 嘘だろ、待ってよ……！」", chara: "haruto", bg: "bg_haruto_room" },
         
-        // --- ここから第2章（動画/タイトルの後に表示） ---
-        { name: "ハルト", text: "「（京都駅に到着して）……ここが、KYOTO。OSAKAとは空気が違う。……GPSが……ノイズで位置が特定できない！」", chara: "haruto", bg: "bg_kyoto_station" },
+        { name: "謎の男", text: "「……高出力ユニットの負荷テスト……コンマ05の誤差で、これほどのズレが出るとはな。『エネルギー変換効率』を過信しすぎたか。」", chara: "kage", bg: "bg_haruto_room" },
+        { name: "ハルト", text: "「誰だ！？ コドウに触るな！」", chara: "haruto", bg: "bg_haruto_room" },
+        { name: "謎の男", text: "「……静かにしてくれ。……急がなければ。」", chara: "kage", bg: "bg_haruto_room" },
+        { name: "システム", text: "（謎の男が重量物を抱え、窓から夜の街へ消えていく）", chara: "none", bg: "bg_haruto_room" },
+
+        // --- 強奪直後 ---
+        { name: "ハルト", text: "「……そんな、嘘だろ。……コドウ……。僕の大事な、たった一人の相棒なのに……」", chara: "haruto", bg: "bg_haruto_room" },
+        { name: "父の声（回想）", text: "『いいか、ハルト。こいつは世界一のロボットだ。宇宙の果てでも、私とお前を繋いでくれる。……迷子になんて、絶対にならないさ』", chara: "none", bg: "bg_haruto_room" },
+        { name: "ハルト", text: "「（ノートをひっ掴む）……そうだ。お父さん、言ってたじゃないか。……『迷子にならない』って。……まさか！」", chara: "haruto", bg: "bg_haruto_room" },
+        { name: "ハルト", text: "「（端末を起動）……隠しパーティション、展開！ ……あった！ 軍事用高精度GPSユニット……！」", chara: "haruto", bg: "bg_haruto_room" },
+        { name: "ハルト", text: "「（ノートをめくる）……落ち着け。絶対に、僕でも辿り着けるように『鍵』を隠してるはずだ。……これだ！」", chara: "haruto", bg: "bg_haruto_room", note: { id: "n0", title: "父の開発ノート", body: "コドウ内蔵のGPS。ロック解除の鍵がノートの図形に隠されていた。" } },
+
+        // --- 追跡開始 〜 OSAKA中央駅 ---
+        { name: "ハルト", text: "「……よし、通った！ コドウの信号をキャッチしたぞ。……『OSAKA中央駅』？ あいつ、駅へ向かってるのか！」", chara: "haruto", bg: "bg_haruto_room" },
+        { name: "システム", text: "（SE：駅の雑踏と、重厚なゲートが閉まる音）", chara: "none", bg: "bg_station" },
+        { name: "ハルト", text: "「ハァ、ハァ……！ やっと着いた。……って、ゲートが閉まった……！？ くそっ、あいつが強引に突破したせいで……！」", chara: "haruto", bg: "bg_station" },
+        { name: "駅アナウンス", text: "『警告。システムを警戒モードへ移行します。復旧には管理パスワードが必要です』", chara: "none", bg: "bg_station" },
+        { name: "ハルト", text: "「……よし、やるしかない。父さんの残した『緊急解除コードのメモ』を解析するんだ！」", chara: "haruto", bg: "bg_station", note: { id: "n2", title: "リニア専用軌道", body: "駅のセキュリティを父の解除コードで突破し、機体「ツルギ」を起動させろ。" } },
+        
+        { name: "ハルト", text: "「……よし、承認された！ システムリブート！ いけ……動けッ！！」", chara: "haruto", bg: "bg_station" },
+        { name: "システム", text: "（SE：駆動音と共に画面が激しくフラッシュ）", chara: "none", bg: "bg_linear", effect: "success" },
+        { name: "ハルト", text: "「目的地は京都だ。……待ってろよ、コドウ。必ず、僕が助け出すから」", chara: "haruto", bg: "bg_linear", videoTrigger: true },
+        
+        // --- 第2章：電脳街「八百万ジャンク」 ---
+        { name: "ハルト", text: "「（京都駅に到着して）……ここが、KYOTO。……この霧、ナノマシンのノイズだ。GPSが位置を特定できない！」", chara: "haruto", bg: "bg_kyoto_station" },
+        { name: "ハルト", text: "「（ノートを照らし合わせる）分かったぞ、店の名前は『八百万ジャンク』だ！」", chara: "haruto", bg: "bg_kyoto_station", note: { id: "n3", title: "電脳街の目印", body: "京都のノイズ霧でも消えない『八百万ジャンク』の赤い鳥居のホログラムを探せ。" } },
         { name: "ハルト", text: "「はぁ、はぁ……捕まえたぞ。……さあ、コドウを返せ！ 今すぐだ！」", chara: "haruto", bg: "bg_cyber_shop" },
-        { name: "謎の男", text: "「……運命のズレは既に始まっているらしい」", chara: "kage", bg: "bg_cyber_shop" },
+        { name: "謎の男", text: "「（ゆっくりと振り返り）……悪いな。だが、こいつは預かっておく。運命のズレは既に始まっているらしい」", chara: "kage", bg: "bg_cyber_shop" },
+        { name: "ハルト", text: "「預かる！？ 勝手なことを言うな！ 僕の相棒だ、お前に触られる筋合いはない！」", chara: "haruto_kodou", bg: "bg_cyber_shop" },
+        { name: "謎の男", text: "「……ああ、その通りだ。本来なら、お前と直接接点を持つことは……『禁止』されている。……本来ならな」", chara: "kage", bg: "bg_cyber_shop" },
+        { name: "ハルト", text: "「禁止……？ 誰にだよ。お前、一体何者なんだ？」", chara: "haruto", bg: "bg_cyber_shop" },
+
         { name: "警備ドローン", text: "『……目標発見。ハルト……ハルト・アマツを確認』", chara: "none", bg: "bg_cyber_shop", effect: "error" },
+        { name: "ハルト", text: "「っ！？ なんだこいつら……！？ なんで、なんで僕の名前を知ってるんだよ！」", chara: "haruto", bg: "bg_cyber_shop" },
+        { name: "ハルト", text: "「……そうか、お前たちの差し金か。こいつらを使って、僕を待ち伏せしてたのか！」", chara: "haruto", bg: "bg_cyber_shop" },
+        { name: "謎の男", text: "「……そいつらは警備用の『ヤタガラス』だ。気をつけたほうがいいぜ」", chara: "kage", bg: "bg_cyber_shop" },
+        { name: "謎の男", text: "「弾はゴム製だが、まともに食らえば骨の二、三本は覚悟しなきゃならない」", chara: "kage", bg: "bg_cyber_shop", note: { id: "n4", title: "ヤタガラス", body: "謎の男が操る警備ドローン。強力なゴム弾を搭載し、ハルトを認識している。" } },
+        { name: "ハルト", text: "「……っ、脅しのつもりかよ！ 自分の仲間の性能を自慢しに来たのか！？」", chara: "haruto", bg: "bg_cyber_shop" },
+        { name: "謎の男", text: "「……自慢じゃない。……事実を言ったまでだ」", chara: "kage", bg: "bg_cyber_shop" },
+
+        { name: "謎の男", text: "「……すまないが、まだ返せない。……こいつは連れていく」", chara: "kage", bg: "bg_cyber_shop" },
+        { name: "ハルト", text: "「待て！ 行かせるかよ！」", chara: "haruto", bg: "bg_cyber_shop" },
         { name: "謎の男", text: "「……取り戻したければ、来い。……かつて、こいつ（コドウ）が生まれた、あの場所に」", chara: "kage", bg: "bg_cyber_shop" },
-        { name: "ハルト", text: "「……あいつ、一体何が目的なんだ……？」", chara: "haruto", bg: "bg_cyber_shop" }
+        { name: "ハルト", text: "「……っ！？ 『コドウが生まれた場所』……？ 、どういうことだ！？」", chara: "haruto", bg: "bg_cyber_shop" },
+        { name: "謎の男", text: "「……詳しい場所は、そのノートを見れば思い出すはずだ。……そこで待っている」", chara: "kage", bg: "bg_cyber_shop" },
+        { name: "ハルト", text: "「（逃走する謎の男を見送りながら）……あいつ、一体何が目的なんだ……？」", chara: "haruto", bg: "bg_cyber_shop" }
     ];
 
     function checkPassword() {
@@ -210,14 +242,13 @@
             titleLogoLayer.style.display = 'none';
             bgm.play();
             fader.classList.remove('active');
-            // 次のシーンへ
             currentStep++;
             showText();
         }, 1500);
     }
 
     function showText() {
-        if (currentStep >= scenario.length) { alert("つづく"); return; }
+        if (currentStep >= scenario.length) { return; }
         const data = scenario[currentStep];
 
         if (data.note && !unlockedNotes.some(n => n.id === data.note.id)) {
@@ -243,7 +274,6 @@
             } else { 
                 clearInterval(typingTimer); 
                 isTyping = false; 
-                // 動画トリガーがある場合
                 if (data.videoTrigger) {
                     setTimeout(playOpeningVideo, 1000);
                 }
@@ -257,32 +287,33 @@
         const kImg = document.getElementById('kage-stand');
         const dImg = document.getElementById('kodou-stand');
         hImg.style.display = "none"; kImg.style.display = "none"; dImg.style.display = "none";
+        
         if (data.chara === "haruto") hImg.style.display = "block";
         else if (data.chara === "kage") kImg.style.display = "block";
         else if (data.chara === "kodou") dImg.style.display = "block";
         else if (data.chara === "haruto_kodou") { hImg.style.display = "block"; dImg.style.display = "block"; }
+        
         if (data.bg) bgArea.style.backgroundImage = `url('img/${data.bg}.png')`;
+        
+        const layer = document.getElementById('effect-layer');
         if (data.effect === "error") {
-            const layer = document.getElementById('effect-layer');
             layer.classList.add('flash-red');
             setTimeout(() => layer.classList.remove('flash-red'), 300);
+        } else if (data.effect === "success") {
+            layer.classList.add('flash-green');
+            setTimeout(() => layer.classList.remove('flash-green'), 400);
         }
     }
 
     function nextScene() {
-        // 動画再生中やタイトル表示中はメッセージ窓のクリックを無効化
         if (videoLayer.style.display === 'flex' || titleLogoLayer.style.display === 'block') return;
-        
         if (isTyping) {
             clearInterval(typingTimer);
             document.getElementById('message-text').innerText = scenario[currentStep].text;
             isTyping = false;
             return;
         }
-        
-        // 動画トリガーのシーンではクリックでの進行を一時停止
         if (scenario[currentStep].videoTrigger) return;
-
         currentStep++;
         showText();
     }
@@ -299,8 +330,7 @@
         document.getElementById('log-screen').style.display = 'flex';
     }
     function closeLog() { document.getElementById('log-screen').style.display = 'none'; }
-    function manualSave() { saveGame(); alert("SAVED!"); }
-    function resetGame() { if (confirm("リセット？")) { localStorage.removeItem('cyber_puzzle_save'); location.reload(); } }
+    function resetGame() { if (confirm("最初からやり直しますか？")) { localStorage.removeItem('cyber_puzzle_save'); location.reload(); } }
     function toggleMute() { bgm.muted = !bgm.muted; document.getElementById('mute-btn').innerText = bgm.muted ? "🔇" : "🔊"; saveGame(); }
     function saveGame() { localStorage.setItem('cyber_puzzle_save', JSON.stringify({ step: currentStep, history: chatHistory, notes: unlockedNotes, muted: bgm.muted })); }
     function loadGame() {
