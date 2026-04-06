@@ -3,14 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-select=none">
-    <title>Core Penetrator 2050</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <title>Grid Breaker: Audio Synth</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
         :root {
             --neon-blue: #00f2fe;
             --neon-red: #ff0055;
-            --neon-green: #00ff9d;
-            --bg-dark: #00050a;
+            --neon-green: #0f0;
+            --bg-dark: #000205;
+            --font-main: 'Orbitron', sans-serif;
+            --font-mono: 'Share Tech Mono', monospace;
         }
 
         * { box-sizing: border-box; touch-action: none; }
@@ -19,7 +21,7 @@
             margin: 0; padding: 0;
             background-color: #000;
             color: #fff;
-            font-family: 'Orbitron', sans-serif;
+            font-family: var(--font-main);
             display: flex; justify-content: center; align-items: center;
             height: 100vh; overflow: hidden;
         }
@@ -27,7 +29,7 @@
         #game-container {
             position: relative;
             width: 100vw;
-            max-width: 500px;
+            max-width: 480px;
             height: 100vh;
             background: var(--bg-dark);
             border-left: 1px solid rgba(0, 242, 254, 0.2);
@@ -39,97 +41,124 @@
 
         .ui {
             position: absolute;
-            top: 30px; left: 0; width: 100%;
-            display: flex; justify-content: space-between;
-            padding: 0 25px;
+            top: 20px; left: 0; width: 100%;
+            display: flex; flex-direction: column;
+            gap: 5px;
+            padding: 0 20px;
             pointer-events: none;
             z-index: 10;
-            font-size: 12px;
+            font-family: var(--font-mono);
+            font-size: 14px;
             color: var(--neon-blue);
-            text-shadow: 0 0 5px var(--neon-blue);
         }
+        .status-row { display: flex; justify-content: space-between; }
 
-        .progress-bar {
+        #p-grid {
             position: absolute;
-            bottom: 0; left: 0; height: 4px;
+            bottom: 0; left: 0; width: 0%; height: 2px;
             background: var(--neon-blue);
             box-shadow: 0 0 10px var(--neon-blue);
-            width: 0%;
-            transition: width 0.1s linear;
         }
 
         .overlay {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 5, 10, 0.9);
+            background: rgba(0, 2, 5, 0.95);
             display: flex; flex-direction: column;
             justify-content: center; align-items: center;
             z-index: 20;
             text-align: center;
-            padding: 20px;
+            padding: 30px;
         }
-
-        h1 { font-size: 24px; color: var(--neon-blue); margin-bottom: 10px; letter-spacing: 2px; }
-        .desc { font-size: 10px; color: rgba(255,255,255,0.5); margin-bottom: 25px; }
 
         .btn {
-            padding: 15px 40px;
+            padding: 16px 40px;
             background: transparent;
-            border: 2px solid var(--neon-blue);
+            border: 1px solid var(--neon-blue);
             color: var(--neon-blue);
-            font-family: 'Orbitron', sans-serif;
+            font-family: var(--font-main);
             cursor: pointer;
-            font-size: 14px;
+            margin-top: 20px;
         }
-        .btn:active { background: var(--neon-blue); color: #000; }
+        
         .hidden { display: none !important; }
-
-        .clear-text { color: var(--neon-green) !important; text-shadow: 0 0 15px var(--neon-green); }
+        .critical { color: var(--neon-red) !important; }
+        .success { color: var(--neon-green) !important; }
     </style>
 </head>
 <body>
 
 <div id="game-container">
     <div class="ui">
-        <div>CORE DEPTH: <span id="dist">0</span> / 300m</div>
-        <div>STABILITY: <span id="spd">100</span>%</div>
+        <div class="status-row">
+            <div>TARGET: 300m</div>
+            <div>[ <span id="dist">0</span>m ]</div>
+        </div>
+        <div class="status-row" style="font-size:12px; opacity:0.8;">
+            <div>AUDIO: ENABLED</div>
+            <div><span id="integrity">100</span>%</div>
+        </div>
     </div>
-    <div class="progress-bar" id="p-bar"></div>
+    <div id="p-grid"></div>
 
     <div id="start-screen" class="overlay">
-        <h1>STREAM INTRUSION</h1>
-        <p class="desc">MISSION: PENETRATE TO 300M DEPTH</p>
-        <button class="btn" id="start-btn">START OVERRIDE</button>
+        <h1>GRID BREAKER</h1>
+        <p style="font-size:12px; opacity:0.6;">> BGM SYNTHESIZER READY</p>
+        <button class="btn" id="start-btn">BOOT SYSTEM</button>
     </div>
 
     <div id="dead-screen" class="overlay hidden">
-        <h1 style="color:var(--neon-red)">CONNECTION LOST</h1>
-        <p class="desc">CORE DISTANCE: <span id="final-dist">0</span>m</p>
-        <button class="btn" id="retry-btn" style="border-color:var(--neon-red); color:var(--neon-red);">RE-INITIALIZE</button>
+        <h1 class="critical">CONNECTION LOST</h1>
+        <button class="btn critical" id="retry-btn">RE-ATTEMPT</button>
     </div>
 
     <div id="clear-screen" class="overlay hidden">
-        <h1 class="clear-text">ACCESS GRANTED</h1>
-        <p class="desc">CORE DATA DECRYPTED SUCCESSFULLY</p>
-        <button class="btn" id="finish-btn" style="border-color:var(--neon-green); color:var(--neon-green);">EXIT SYSTEM</button>
+        <h1 class="success">ACCESS GRANTED</h1>
+        <button class="btn success" id="finish-btn">TERMINATE</button>
     </div>
 
     <canvas id="canvas"></canvas>
 </div>
 
 <script>
+    // --- オーディオエンジン (Web Audio API) ---
+    let audioCtx = null;
+    let mainGain = null;
+
+    function initAudio() {
+        if (audioCtx) return;
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        mainGain = audioCtx.createGain();
+        mainGain.connect(audioCtx.destination);
+        mainGain.gain.value = 0.15; // 全体の音量
+    }
+
+    function playNote(freq, type, duration, volume = 1) {
+        if (!audioCtx) return;
+        const osc = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        g.gain.setValueAtTime(volume, audioCtx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+        osc.connect(g);
+        g.connect(mainGain);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+    }
+
+    // --- ゲーム本体 ---
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
     const container = document.getElementById('game-container');
     const distDisp = document.getElementById('dist');
-    const spdDisp = document.getElementById('spd');
-    const progressBar = document.getElementById('p-bar');
+    const progressGrid = document.getElementById('p-grid');
 
     let active = false;
     let distance = 0;
     const GOAL = 300;
-    let speed = 4;
-    let player = { x: 0, y: 0, r: 10, tx: 0, ty: 0 };
+    let speed = 4.5;
+    let player = { x: 0, y: 0, size: 15, tx: 0, ty: 0 };
     let obstacles = [];
     let frame = 0;
 
@@ -137,110 +166,88 @@
         canvas.width = container.clientWidth;
         canvas.height = container.clientHeight;
         player.x = canvas.width / 2;
-        player.y = canvas.height * 0.75;
+        player.y = canvas.height * 0.8;
         player.tx = player.x;
         player.ty = player.y;
     }
 
-    class Obstacle {
+    class ErrorGrid {
         constructor() {
-            // 距離が進むほど障害物の幅のバリエーションを増やす
-            const minW = 50;
-            const maxW = canvas.width * (0.4 + (distance / 1000)); 
-            this.w = Math.random() * (maxW - minW) + minW;
+            this.w = Math.random() * (canvas.width * 0.6) + 40;
             this.h = 18;
             this.x = Math.random() * (canvas.width - this.w);
             this.y = -50;
-            // 速度に少しランダム性を持たせる
-            this.speedMod = 0.8 + Math.random() * 0.4;
         }
-        update() {
-            this.y += speed * this.speedMod;
-        }
+        update() { this.y += speed; }
         draw() {
-            ctx.fillStyle = 'rgba(0, 242, 254, 0.15)';
-            ctx.strokeStyle = varToHex('--neon-blue');
-            ctx.lineWidth = 1;
-            ctx.shadowBlur = 8;
-            ctx.shadowColor = varToHex('--neon-blue');
-            ctx.fillRect(this.x, this.y, this.w, this.h);
+            ctx.strokeStyle = '#ff0055';
             ctx.strokeRect(this.x, this.y, this.w, this.h);
-            ctx.shadowBlur = 0;
-        }
-    }
-
-    function spawn() {
-        // 重要：距離に応じて出現間隔(interval)を短くする（障害物を増やす）
-        // 0mで40フレーム、300mで18フレーム程度まで密集
-        let interval = Math.max(16, 40 - Math.floor(distance / 12));
-        
-        if (frame % interval === 0) {
-            obstacles.push(new Obstacle());
+            ctx.fillStyle = 'rgba(255, 0, 85, 0.2)';
+            ctx.fillRect(this.x, this.y, this.w, this.h);
         }
     }
 
     function update() {
         if (!active) return;
         frame++;
-        distance += 0.15; // 進むスピード
-        
-        // 速度の上昇（4.0から最大8.0くらいまで）
-        speed = 4 + (distance / 60);
+        distance += 0.15;
+        speed = 4.5 + (distance / 50);
 
-        // UI表示
         distDisp.innerText = Math.floor(distance);
-        let stability = Math.max(0, 100 - Math.floor((distance/GOAL)*50));
-        spdDisp.innerText = stability;
-        progressBar.style.width = (distance / GOAL * 100) + '%';
+        progressGrid.style.width = (distance / GOAL * 100) + '%';
 
-        // クリア判定
-        if (distance >= GOAL) {
-            gameClear();
-            return;
+        // --- BGMエンジン ---
+        // 16フレームごとにベース音を鳴らす（速度に合わせて間隔を狭める）
+        let tempo = Math.max(8, 20 - Math.floor(distance / 20));
+        if (frame % tempo === 0) {
+            const beat = (frame / tempo) % 4;
+            const notes = [55, 55, 65, 41]; // 低音ベースライン (A1, A1, C2, E1的な)
+            playNote(notes[beat], 'square', 0.4, 0.5);
+            
+            // スネア的なノイズ音 (2拍目と4拍目)
+            if (beat === 1 || beat === 3) {
+                playNote(100, 'sawtooth', 0.1, 0.2);
+            }
         }
 
-        // プレイヤー移動
+        if (distance >= GOAL) { gameClear(); return; }
+
         player.x += (player.tx - player.x) * 0.2;
         player.y += (player.ty - player.y) * 0.2;
 
-        // 衝突判定
         obstacles.forEach((o) => {
             o.update();
-            if (player.x + player.r * 0.6 > o.x && 
-                player.x - player.r * 0.6 < o.x + o.w &&
-                player.y + player.r * 0.6 > o.y && 
-                player.y - player.r * 0.6 < o.y + o.h) {
+            if (player.x > o.x && player.x < o.x + o.w && player.y > o.y && player.y < o.y + o.h) {
                 gameOver();
             }
         });
 
+        if (frame % Math.max(10, 30 - Math.floor(distance/15)) === 0) {
+            obstacles.push(new ErrorGrid());
+        }
         obstacles = obstacles.filter(o => o.y < canvas.height + 50);
-        spawn();
     }
 
     function draw() {
-        ctx.fillStyle = '#000510';
+        ctx.fillStyle = '#000205';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        // スキャンライン背景
-        ctx.strokeStyle = 'rgba(0, 242, 254, 0.03)';
-        for(let i=0; i<canvas.height; i+=20) {
-            ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(canvas.width, i); ctx.stroke();
-        }
-
+        
         obstacles.forEach(o => o.draw());
 
-        // プレイヤー（コア）
-        ctx.shadowBlur = 15;
-        ctx.shadowColor = varToHex('--neon-blue');
+        // プレイヤー (Δ)
+        ctx.save();
+        ctx.translate(player.x, player.y);
         ctx.fillStyle = '#fff';
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = '#00f2fe';
         ctx.beginPath();
-        ctx.arc(player.x, player.y, player.r, 0, Math.PI*2);
+        ctx.moveTo(0, -player.size);
+        ctx.lineTo(-player.size, player.size);
+        ctx.lineTo(player.size, player.size);
+        ctx.closePath();
         ctx.fill();
-        ctx.shadowBlur = 0;
+        ctx.restore();
     }
-
-    function varToHex(v) { return v === '--neon-blue' ? '#00f2fe' : '#ff0055'; }
 
     function loop() {
         update();
@@ -250,12 +257,14 @@
 
     function gameOver() {
         active = false;
-        document.getElementById('final-dist').innerText = Math.floor(distance);
+        playNote(150, 'sawtooth', 0.5, 1); // 失敗音
         document.getElementById('dead-screen').classList.remove('hidden');
     }
 
     function gameClear() {
         active = false;
+        playNote(440, 'sine', 0.2, 1); // 成功音
+        setTimeout(()=>playNote(880, 'sine', 0.5, 1), 100);
         document.getElementById('clear-screen').classList.remove('hidden');
     }
 
@@ -264,31 +273,22 @@
         const cx = e.touches ? e.touches[0].clientX : e.clientX;
         const cy = e.touches ? e.touches[0].clientY : e.clientY;
         player.tx = cx - rect.left;
-        // 指の下を少し開ける（視認性確保）
-        player.ty = cy - rect.top - 40; 
+        player.ty = cy - rect.top - 50;
     }
 
     container.addEventListener('mousemove', move);
     container.addEventListener('touchmove', (e) => { move(e); e.preventDefault(); }, {passive:false});
 
-    document.getElementById('start-btn').onclick = reset;
+    document.getElementById('start-btn').onclick = () => { initAudio(); reset(); };
     document.getElementById('retry-btn').onclick = reset;
     document.getElementById('finish-btn').onclick = () => location.reload();
 
     function reset() {
-        distance = 0;
-        speed = 4;
-        obstacles = [];
-        frame = 0;
-        document.getElementById('start-screen').classList.add('hidden');
-        document.getElementById('dead-screen').classList.add('hidden');
-        document.getElementById('clear-screen').classList.add('hidden');
-        init();
-        active = true;
-        loop();
+        distance = 0; speed = 4.5; obstacles = []; frame = 0;
+        document.querySelectorAll('.overlay').forEach(el => el.classList.add('hidden'));
+        init(); active = true; loop();
     }
 
-    window.onresize = init;
     init();
 </script>
 </body>
