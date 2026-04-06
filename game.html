@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-select=none">
+    <title>Gate Decryptor Mobile 2050</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-blue: #00f2fe;
+            --neon-green: #4facfe;
+            --neon-red: #ff0055;
+            --bg-dark: #00050a;
+            --font-main: 'Orbitron', sans-serif;
+            --font-sub: 'Rajdhani', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #000;
+            font-family: var(--font-sub);
+            color: #fff;
+            overflow: hidden;
+            /* 背景グリッド */
+            background-image: 
+                linear-gradient(rgba(0, 242, 254, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 242, 254, 0.05) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+
+        /* 縦型デバイス・スマホ外枠 */
+        .mobile-device {
+            width: 90vw;
+            max-width: 400px;
+            height: 85vh;
+            max-height: 800px;
+            background: rgba(10, 25, 40, 0.95);
+            border: 2px solid rgba(0, 242, 254, 0.3);
+            border-radius: 40px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 50px rgba(0, 242, 254, 0.2);
+            position: relative;
+        }
+
+        /* インジケーター類（上部） */
+        .status-header {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px 10px;
+            font-family: var(--font-main);
+            font-size: 10px;
+            letter-spacing: 1px;
+        }
+
+        .life-display {
+            color: var(--neon-red);
+            text-shadow: 0 0 8px var(--neon-red);
+        }
+
+        /* タイトル */
+        .title-section {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-family: var(--font-main);
+            font-size: 18px;
+            margin: 0;
+            color: var(--neon-blue);
+            text-shadow: 0 0 10px var(--neon-blue);
+        }
+
+        .subtitle {
+            font-size: 9px;
+            opacity: 0.6;
+            margin-top: 5px;
+        }
+
+        /* ゲージエリア（中央） */
+        .game-main {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 40px;
+        }
+
+        .gauge-wrapper {
+            width: 100%;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        #gauge-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            position: relative;
+        }
+
+        #safety-zone {
+            position: absolute;
+            height: 200%;
+            top: -50%;
+            background: rgba(0, 242, 254, 0.15);
+            left: 50%;
+            transform: translateX(-50%);
+            border-left: 2px solid var(--neon-blue);
+            border-right: 2px solid var(--neon-blue);
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.4);
+        }
+
+        #pointer {
+            position: absolute;
+            width: 3px;
+            height: 60px;
+            background: #fff;
+            top: 50%;
+            transform: translateY(-50%);
+            box-shadow: 0 0 15px #fff, 0 0 5px var(--neon-blue);
+            border-radius: 2px;
+            z-index: 10;
+        }
+
+        #message {
+            font-family: var(--font-main);
+            font-size: 14px;
+            height: 20px;
+            text-align: center;
+        }
+
+        /* 操作エリア（下部） */
+        .controls {
+            padding-bottom: 30px;
+            display: flex;
+            justify-content: center;
+        }
+
+        #action-btn {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 4px solid var(--neon-blue);
+            background: transparent;
+            color: var(--neon-blue);
+            font-family: var(--font-main);
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.2);
+            transition: all 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #action-btn:active {
+            transform: scale(0.9);
+            background: rgba(0, 242, 254, 0.2);
+            box-shadow: 0 0 40px rgba(0, 242, 254, 0.5);
+        }
+
+        .success { color: var(--neon-green); text-shadow: 0 0 10px var(--neon-green); }
+        .fail { color: var(--neon-red); text-shadow: 0 0 10px var(--neon-red); }
+    </style>
+</head>
+<body>
+
+<div class="mobile-device">
+    <div class="status-header">
+        <div>LAYER: <span id="stg" style="color:var(--neon-blue)">1</span>/5</div>
+        <div id="lives" class="life-display">💎💎💎💎💎</div>
+    </div>
+
+    <div class="title-section">
+        <h1>GATE DECRYPTOR</h1>
+        <div class="subtitle">SECURITY LEVEL: HIGH</div>
+    </div>
+
+    <div class="game-main">
+        <div id="message">READY TO SYNC</div>
+        
+        <div class="gauge-wrapper">
+            <div id="gauge-bar">
+                <div id="safety-zone"></div>
+                <div id="pointer"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button id="action-btn">START</button>
+    </div>
+</div>
+
+<script>
+    const pointer = document.getElementById('pointer');
+    const safetyZone = document.getElementById('safety-zone');
+    const stgDisp = document.getElementById('stg');
+    const lifeDisp = document.getElementById('lives');
+    const msgDisp = document.getElementById('message');
+    const btn = document.getElementById('action-btn');
+
+    let stg = 1;
+    let lives = 5;
+    let pos = 0;
+    let dir = 1;
+    let active = false;
+    let loopId = null;
+
+    const levels = {
+        1: { s: 0.8, w: 40 },
+        2: { s: 1.5, w: 30 },
+        3: { s: 2.3, w: 22 },
+        4: { s: 3.5, w: 16 },
+        5: { s: 5.2, w: 10 }
+    };
+
+    function update() {
+        stgDisp.innerText = stg;
+        lifeDisp.innerText = "💎".repeat(lives) + "🖤".repeat(5 - lives);
+        safetyZone.style.width = levels[stg].w + '%';
+    }
+
+    function run() {
+        if (active) {
+            pos += levels[stg].s * dir;
+            if (pos >= 100) { pos = 100; dir = -1; }
+            if (pos <= 0) { pos = 0; dir = 1; }
+            pointer.style.left = pos + '%';
+            loopId = requestAnimationFrame(run);
+        }
+    }
+
+    function trigger() {
+        // 初回スタート
+        if (!active && btn.innerText === "START") {
+            active = true;
+            btn.innerText = "EXECUTE";
+            msgDisp.innerText = "SYNCING...";
+            msgDisp.className = "";
+            run();
+            return;
+        }
+
+        if (!active) return;
+
+        // 判定
+        const w = levels[stg].w;
+        if (pos >= 50 - w/2 && pos <= 50 + w/2) {
+            // 成功
+            active = false;
+            cancelAnimationFrame(loopId);
+            if (stg < 5) {
+                msgDisp.innerText = "LAYER " + stg + " UNLOCKED";
+                msgDisp.className = "success";
+                stg++;
+                btn.style.opacity = "0.3";
+                setTimeout(() => {
+                    update();
+                    pos = 0;
+                    dir = 1;
+                    pointer.style.left = '0%';
+                    active = true;
+                    btn.style.opacity = "1";
+                    msgDisp.innerText = "SYNCING...";
+                    msgDisp.className = "";
+                    run();
+                }, 1000);
+            } else {
+                msgDisp.innerText = "GATE OPENED";
+                msgDisp.className = "success";
+                btn.innerText = "FINISH";
+                btn.onclick = () => location.reload();
+            }
+        } else {
+            // 失敗
+            lives--;
+            update();
+            if (lives <= 0) {
+                active = false;
+                msgDisp.innerText = "SYSTEM LOCKED";
+                msgDisp.className = "fail";
+                btn.innerText = "RETRY";
+                btn.onclick = () => location.reload();
+            } else {
+                msgDisp.innerText = "SYNC ERROR";
+                msgDisp.className = "fail";
+                active = false;
+                setTimeout(() => {
+                    if (lives > 0) {
+                        active = true;
+                        msgDisp.innerText = "SYNCING...";
+                        msgDisp.className = "";
+                        run();
+                    }
+                }, 600);
+            }
+        }
+    }
+
+    // タッチとクリック両対応
+    btn.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        trigger();
+    });
+    btn.addEventListener('mousedown', (e) => {
+        if (!('ontouchstart' in window)) trigger();
+    });
+
+    // キーボード（スペース）対応
+    window.addEventListener('keydown', (e) => {
+        if(e.code === 'Space') {
+            e.preventDefault();
+            trigger();
+        }
+    });
+
+    update();
+</script>
+</body>
+</html>
