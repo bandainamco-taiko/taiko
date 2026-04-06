@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-select=none">
-    <title>Gate Decryptor Mobile 2050</title>
+    <title>Gate Decryptor Mobile 2050 - EXTREME</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -31,14 +31,12 @@
             font-family: var(--font-sub);
             color: #fff;
             overflow: hidden;
-            /* 背景グリッド */
             background-image: 
                 linear-gradient(rgba(0, 242, 254, 0.05) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(0, 242, 254, 0.05) 1px, transparent 1px);
             background-size: 30px 30px;
         }
 
-        /* 縦型デバイス・スマホ外枠 */
         .mobile-device {
             width: 90vw;
             max-width: 400px;
@@ -54,7 +52,6 @@
             position: relative;
         }
 
-        /* インジケーター類（上部） */
         .status-header {
             display: flex;
             justify-content: space-between;
@@ -69,7 +66,6 @@
             text-shadow: 0 0 8px var(--neon-red);
         }
 
-        /* タイトル */
         .title-section {
             text-align: center;
             margin-bottom: 30px;
@@ -89,7 +85,6 @@
             margin-top: 5px;
         }
 
-        /* ゲージエリア（中央） */
         .game-main {
             flex-grow: 1;
             display: flex;
@@ -118,8 +113,8 @@
 
         #safety-zone {
             position: absolute;
-            height: 200%;
-            top: -50%;
+            height: 250%;
+            top: -75%;
             background: rgba(0, 242, 254, 0.15);
             left: 50%;
             transform: translateX(-50%);
@@ -130,7 +125,7 @@
 
         #pointer {
             position: absolute;
-            width: 3px;
+            width: 4px;
             height: 60px;
             background: #fff;
             top: 50%;
@@ -147,7 +142,6 @@
             text-align: center;
         }
 
-        /* 操作エリア（下部） */
         .controls {
             padding-bottom: 30px;
             display: flex;
@@ -192,7 +186,7 @@
 
     <div class="title-section">
         <h1>GATE DECRYPTOR</h1>
-        <div class="subtitle">SECURITY LEVEL: HIGH</div>
+        <div class="subtitle">SECURITY LEVEL: EXTREME</div>
     </div>
 
     <div class="game-main">
@@ -226,13 +220,67 @@
     let active = false;
     let loopId = null;
 
+    // 難易度を上げたレベル設定
     const levels = {
-        1: { s: 0.8, w: 40 },
-        2: { s: 1.5, w: 30 },
-        3: { s: 2.3, w: 22 },
-        4: { s: 3.5, w: 16 },
-        5: { s: 5.2, w: 10 }
+        1: { s: 1.2, w: 35 },
+        2: { s: 2.2, w: 25 },
+        3: { s: 3.5, w: 18 },
+        4: { s: 5.0, w: 12 },
+        5: { s: 7.5, w: 7 }
     };
+
+    // --- 効果音生成エンジン (Web Audio API) ---
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    
+    function playSound(type) {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        const now = audioCtx.currentTime;
+
+        if (type === 'start') {
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(440, now);
+            osc.frequency.exponentialRampToValueAtTime(880, now + 0.1);
+            gain.gain.setValueAtTime(0.1, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+            osc.start();
+            osc.stop(now + 0.1);
+        } else if (type === 'success') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(660, now);
+            osc.frequency.exponentialRampToValueAtTime(1320, now + 0.2);
+            gain.gain.setValueAtTime(0.1, now);
+            gain.gain.linearRampToValueAtTime(0, now + 0.2);
+            osc.start();
+            osc.stop(now + 0.2);
+        } else if (type === 'fail') {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(150, now);
+            osc.frequency.linearRampToValueAtTime(50, now + 0.3);
+            gain.gain.setValueAtTime(0.1, now);
+            gain.gain.linearRampToValueAtTime(0, now + 0.3);
+            osc.start();
+            osc.stop(now + 0.3);
+        } else if (type === 'clear') {
+            // ファンファーレ的な音
+            const notes = [523.25, 659.25, 783.99, 1046.50];
+            notes.forEach((freq, i) => {
+                const o = audioCtx.createOscillator();
+                const g = audioCtx.createGain();
+                o.type = 'triangle';
+                o.connect(g);
+                g.connect(audioCtx.destination);
+                o.frequency.setValueAtTime(freq, now + i * 0.1);
+                g.gain.setValueAtTime(0.1, now + i * 0.1);
+                g.gain.exponentialRampToValueAtTime(0.01, now + i * 0.1 + 0.3);
+                o.start(now + i * 0.1);
+                o.stop(now + i * 0.1 + 0.3);
+            });
+        }
+    }
 
     function update() {
         stgDisp.innerText = stg;
@@ -251,8 +299,11 @@
     }
 
     function trigger() {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+
         // 初回スタート
         if (!active && btn.innerText === "START") {
+            playSound('start');
             active = true;
             btn.innerText = "EXECUTE";
             msgDisp.innerText = "SYNCING...";
@@ -270,6 +321,7 @@
             active = false;
             cancelAnimationFrame(loopId);
             if (stg < 5) {
+                playSound('success');
                 msgDisp.innerText = "LAYER " + stg + " UNLOCKED";
                 msgDisp.className = "success";
                 stg++;
@@ -284,8 +336,9 @@
                     msgDisp.innerText = "SYNCING...";
                     msgDisp.className = "";
                     run();
-                }, 1000);
+                }, 600); // 難易度調整: 次への移行を速めた
             } else {
+                playSound('clear');
                 msgDisp.innerText = "GATE OPENED";
                 msgDisp.className = "success";
                 btn.innerText = "FINISH";
@@ -293,6 +346,7 @@
             }
         } else {
             // 失敗
+            playSound('fail');
             lives--;
             update();
             if (lives <= 0) {
@@ -312,12 +366,11 @@
                         msgDisp.className = "";
                         run();
                     }
-                }, 600);
+                }, 400); // 難易度調整: 再開を速めた
             }
         }
     }
 
-    // タッチとクリック両対応
     btn.addEventListener('touchstart', (e) => {
         e.preventDefault();
         trigger();
@@ -326,7 +379,6 @@
         if (!('ontouchstart' in window)) trigger();
     });
 
-    // キーボード（スペース）対応
     window.addEventListener('keydown', (e) => {
         if(e.code === 'Space') {
             e.preventDefault();
