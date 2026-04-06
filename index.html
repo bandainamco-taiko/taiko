@@ -9,60 +9,27 @@
         :root {
             --cyber-blue: #00f2ff;
             --cyber-pink: #ff00ff;
-            --cyber-green: #00ffaa;
-            --cyber-yellow: #ffea00;
             --wa-indigo: rgba(13, 27, 42, 0.95);
         }
-
-        body, html {
-            margin: 0; padding: 0; width: 100%; height: 100dvh; 
-            background-color: #000; color: #ffffff;
-            font-family: "Sawarabi Mincho", serif;
-            display: flex; justify-content: center; align-items: center;
-            overflow: hidden; touch-action: none;
-        }
-
-        #game-container {
-            position: relative; width: 100%; max-width: 500px; height: 100%;
-            background-color: #050505; display: none; flex-direction: column; box-sizing: border-box;
-        }
-
-        #menu-bar {
-            position: absolute; top: 45px; left: 0; right: 0; 
-            z-index: 6000; display: flex; gap: 5px; justify-content: flex-end; padding: 0 10px;
-        }
-        .menu-btn {
-            background: rgba(0, 20, 40, 0.9); border: 1px solid var(--cyber-blue);
-            color: var(--cyber-blue); padding: 8px 10px; cursor: pointer;
-            font-size: 0.65rem; font-weight: bold; border-radius: 4px;
-            box-shadow: 0 0 10px rgba(0, 242, 255, 0.4); font-family: sans-serif;
-        }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100dvh; background-color: #000; color: #ffffff; font-family: "Sawarabi Mincho", serif; display: flex; justify-content: center; align-items: center; overflow: hidden; touch-action: none; }
+        #game-container { position: relative; width: 100%; max-width: 500px; height: 100%; background-color: #050505; display: none; flex-direction: column; box-sizing: border-box; }
+        
+        /* Menu Bar */
+        #menu-bar { position: absolute; top: 45px; left: 0; right: 0; z-index: 6000; display: flex; gap: 5px; justify-content: flex-end; padding: 0 10px; }
+        .menu-btn { background: rgba(0, 20, 40, 0.9); border: 1px solid var(--cyber-blue); color: var(--cyber-blue); padding: 8px 10px; cursor: pointer; font-size: 0.65rem; font-weight: bold; border-radius: 4px; box-shadow: 0 0 10px rgba(0, 242, 255, 0.4); font-family: sans-serif; }
         .btn-note { border-color: var(--cyber-pink); color: var(--cyber-pink); box-shadow: 0 0 10px rgba(255, 0, 255, 0.4); }
-
+        
         #fader { position: absolute; inset: 0; background: #000; z-index: 8000; opacity: 0; pointer-events: none; transition: opacity 1.5s ease; }
         #fader.active { opacity: 1; pointer-events: auto; }
-
-        #bg-area { flex: 1; width: 100%; background-image: url('img/haikei01.png'); background-size: cover; background-position: center; position: relative; overflow: hidden; transition: background-image 0.5s ease-in-out; }
+        #bg-area { flex: 1; width: 100%; background-image: url('img/haikei01.png'); background-size: cover; background-position: center; position: relative; overflow: hidden; transition: background-image 0.5s ease; }
         .chara-stand { position: absolute; z-index: 2; display: none; filter: drop-shadow(0 0 15px #000); pointer-events: none; }
         .human-stand { height: 82%; bottom: -5px; left: 50%; transform: translateX(-50%); }
-        .mascot-stand { height: 35%; bottom: 12%; left: auto; right: 25px; transform: none; }
+        .mascot-stand { height: 35%; bottom: 12%; left: auto; right: 25px; }
 
-        #gps-layer {
-            position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%);
-            z-index: 10; display: none; flex-direction: column; align-items: center;
-        }
-        .radar {
-            position: relative; width: 240px; height: 240px;
-            border: 2px solid var(--cyber-blue); border-radius: 50%;
-            background-color: #050a10; 
-            background-image: radial-gradient(circle, rgba(0, 242, 255, 0.1) 0%, rgba(0, 0, 0, 0.7) 85%);
-            overflow: hidden; box-shadow: 0 0 20px rgba(0, 242, 255, 0.3);
-        }
-        .radar-map-grid {
-            position: absolute; inset: 0;
-            background-image: linear-gradient(rgba(0, 242, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 242, 255, 0.05) 1px, transparent 1px);
-            background-size: 20px 20px; background-position: center;
-        }
+        /* GPS Layer (デザイン完全復元版) */
+        #gps-layer { position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%); z-index: 10; display: none; flex-direction: column; align-items: center; pointer-events: none; }
+        .radar { position: relative; width: 240px; height: 240px; border: 2px solid var(--cyber-blue); border-radius: 50%; background-color: #050a10; background-image: radial-gradient(circle, rgba(0, 242, 255, 0.1) 0%, rgba(0, 0, 0, 0.7) 85%); overflow: hidden; box-shadow: 0 0 20px rgba(0, 242, 255, 0.3); }
+        .radar-map-grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(0, 242, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 242, 255, 0.05) 1px, transparent 1px); background-size: 20px 20px; background-position: center; }
         .map-road { position: absolute; background: rgba(0, 242, 255, 0.15); }
         .road-main { top: 0; left: 40%; width: 20px; height: 100%; transform: rotate(10deg); }
         .road-sub { top: 55%; left: 0; width: 100%; height: 12px; transform: rotate(-5deg); }
@@ -71,29 +38,18 @@
         .b-2 { top: 15%; left: 65%; width: 30px; height: 70px; }
         .b-3 { top: 45%; left: 45%; width: 45px; height: 25px; }
         .b-4 { top: 75%; left: 20%; width: 35px; height: 35px; }
-        .radar-location-name { 
-            position: absolute; top: 58%; left: 50%; transform: translate(-50%, -50%); 
-            color: var(--cyber-blue); font-family: sans-serif; font-size: 0.85rem; font-weight: 900; 
-            letter-spacing: 0.15em; text-shadow: 0 0 8px var(--cyber-blue); white-space: nowrap; z-index: 6;
-        }
+        .radar-location-name { position: absolute; top: 58%; left: 50%; transform: translate(-50%, -50%); color: var(--cyber-blue); font-family: sans-serif; font-size: 0.85rem; font-weight: 900; letter-spacing: 0.15em; text-shadow: 0 0 8px var(--cyber-blue); white-space: nowrap; z-index: 6; }
         .radar-sweep { position: absolute; inset: 0; background: conic-gradient(from 0deg, transparent 70%, rgba(0, 242, 255, 0.2) 100%); animation: rotate-radar 4s linear infinite; }
         .radar-target { position: absolute; top: 62%; left: 52%; width: 10px; height: 10px; background-color: var(--cyber-pink); border-radius: 50%; box-shadow: 0 0 15px var(--cyber-pink); animation: blink-target 1s infinite; z-index: 7; }
         @keyframes rotate-radar { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         @keyframes blink-target { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.2); } }
 
-        #msg-window {
-            height: 32%; width: 100%; background: var(--wa-indigo); border-top: 2px solid var(--cyber-blue);
-            padding: 20px 25px calc(25px + env(safe-area-inset-bottom)); box-sizing: border-box; cursor: pointer; z-index: 5; position: relative; display: none;
-        }
-        #message-text { font-size: 1rem; line-height: 1.6; letter-spacing: 0.05em; white-space: pre-wrap; }
-
-        .full-overlay { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.98); z-index: 9500; display: none; flex-direction: column; padding: 60px 25px 40px; }
-        .btn-cyber { padding: 12px 35px; font-size: 1.1rem; background: transparent; color: var(--cyber-blue); border: 1px solid var(--cyber-blue); cursor: pointer; clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%); }
-        .flash-red { animation: flash-red-anim 0.3s ease-out; }
-        @keyframes flash-red-anim { 0% { background-color: rgba(255, 0, 0, 0.6); } 100% { background-color: transparent; } }
-        .flash-green { animation: flash-green-anim 0.4s ease-out; }
-        @keyframes flash-green-anim { 0% { background-color: rgba(0, 255, 170, 0.7); } 100% { background-color: transparent; } }
-        
+        #msg-window { height: 32%; width: 100%; background: var(--wa-indigo); border-top: 2px solid var(--cyber-blue); padding: 20px 25px; box-sizing: border-box; cursor: pointer; z-index: 5; position: relative; display: none; }
+        #message-text { font-size: 1rem; line-height: 1.6; white-space: pre-wrap; }
+        .full-overlay { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.98); z-index: 9500; display: none; flex-direction: column; padding: 60px 25px; }
+        .btn-cyber { padding: 12px 35px; background: transparent; color: var(--cyber-blue); border: 1px solid var(--cyber-blue); cursor: pointer; clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%); }
+        .flash-red { animation: fr 0.3s ease; } @keyframes fr { 0% { background: rgba(255,0,0,0.5); } 100% { background: transparent; } }
+        .flash-green { animation: fg 0.4s ease; } @keyframes fg { 0% { background: rgba(0,255,170,0.5); } 100% { background: transparent; } }
         .note-item { border-bottom: 1px solid #333; padding: 10px 0; }
         .note-title { color: var(--cyber-pink); font-weight: bold; font-size: 0.9rem; }
         .note-body { font-size: 0.8rem; color: #ccc; margin-top: 5px; }
@@ -104,9 +60,9 @@
 <audio id="bgm" src="music/intro.mp3" loop></audio>
 <div id="fader"></div>
 
-<div id="password-screen" style="position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; background: radial-gradient(circle, #0d1b2a, #000); padding: 20px;">
-    <p style="letter-spacing: 0.2em; font-size: 0.8rem; color: var(--cyber-blue); margin-bottom:10px;">SYSTEM CHECK</p>
-    <input type="password" id="pw-field" placeholder="PASSCODE" onkeydown="if(event.key==='Enter')checkPassword()" style="background: rgba(0, 242, 255, 0.1); border: 1px solid var(--cyber-blue); color: #fff; padding: 12px; font-size: 1.2rem; text-align: center; margin-bottom: 20px; width: 80%;">
+<div id="password-screen" style="position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; background: #000; padding: 20px;">
+    <p style="color: var(--cyber-blue); margin-bottom:10px;">SYSTEM CHECK</p>
+    <input type="password" id="pw-field" placeholder="PASSCODE" onkeydown="if(event.key==='Enter')checkPassword()" style="background: rgba(0, 242, 255, 0.1); border: 1px solid var(--cyber-blue); color: #fff; padding: 12px; text-align: center; margin-bottom: 20px; width: 80%;">
     <button class="btn-cyber" onclick="checkPassword()">認証</button>
 </div>
 
@@ -117,213 +73,46 @@
         <button class="menu-btn" id="mute-btn" onclick="toggleMute()">🔊</button>
         <button class="menu-btn" onclick="resetGame()">RESET</button>
     </div>
-
-    <div id="note-screen" class="full-overlay">
-        <h2 style="color: var(--cyber-pink); margin-top:0;">DEVELOPER NOTE</h2>
-        <div id="note-content" style="flex:1; overflow-y:auto;"></div>
-        <button class="menu-btn" style="border-color:#fff; color:#fff; margin-top:10px;" onclick="closeNote()">CLOSE</button>
-    </div>
-
-    <div id="log-screen" class="full-overlay">
-        <h2 style="color: var(--cyber-blue); margin-top:0;">BACK LOG</h2>
-        <div id="log-content" style="flex:1; overflow-y:auto;"></div>
-        <button class="menu-btn" style="border-color:#fff; color:#fff; margin-top:10px;" onclick="closeLog()">CLOSE</button>
-    </div>
-
-    <div id="title-screen" style="position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100; background: radial-gradient(circle, #0d1b2a, #000); padding: 20px;">
-        <h1 style="text-align:center;">音の足跡、<br>記憶の鼓動</h1>
-        <button class="btn-cyber" id="start-btn" onclick="startGame()">START</button>
-    </div>
-
+    <div id="note-screen" class="full-overlay"><h2>DEVELOPER NOTE</h2><div id="note-content" style="flex:1; overflow-y:auto;"></div><button class="btn-cyber" onclick="closeNote()">CLOSE</button></div>
+    <div id="log-screen" class="full-overlay"><h2>BACK LOG</h2><div id="log-content" style="flex:1; overflow-y:auto;"></div><button class="btn-cyber" onclick="closeLog()">CLOSE</button></div>
+    <div id="title-screen" style="position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100; background: #000;"><h1>音の足跡、<br>記憶の鼓動</h1><button class="btn-cyber" onclick="startGame()">START</button></div>
     <div id="bg-area">
         <div id="effect-layer" style="position:absolute; inset:0; pointer-events:none; z-index:3;"></div>
-        
-        <div id="gps-layer">
-            <div class="radar">
-                <div class="radar-map-grid"></div>
-                <div class="map-road road-main"></div>
-                <div class="map-road road-sub"></div>
-                <div class="map-building b-1"></div>
-                <div class="map-building b-2"></div>
-                <div class="map-building b-3"></div>
-                <div class="map-building b-4"></div>
-                <div class="radar-location-name" id="radar-loc-text">Neo-Osaka-ST</div>
-                <div class="radar-sweep"></div>
-                <div class="radar-target"></div>
-            </div>
-            <div style="color: var(--cyber-blue); font-family: monospace; font-size: 0.7rem; margin-top: 10px; letter-spacing: 0.1em; text-shadow: 0 0 5px var(--cyber-blue);">TARGETING SIGNAL...</div>
-        </div>
-
-        <img id="haruto-stand" class="chara-stand human-stand" src="img/haruto01.png" alt="Haruto">
-        <img id="kage-stand" class="chara-stand human-stand" src="img/kage01.png" alt="Kage">
-        <img id="kodou-stand" class="chara-stand mascot-stand" src="img/kodou01.png" alt="Kodou">
+        <div id="gps-layer"><div class="radar"><div class="radar-map-grid"></div><div class="map-road road-main"></div><div class="map-road road-sub"></div><div class="map-building b-1"></div><div class="map-building b-2"></div><div class="map-building b-3"></div><div class="map-building b-4"></div><div class="radar-location-name" id="loc-text"></div><div class="radar-sweep"></div><div class="radar-target"></div></div></div>
+        <img id="haruto-stand" class="chara-stand human-stand" src="img/haruto01.png"><img id="kage-stand" class="chara-stand human-stand" src="img/kage01.png"><img id="kodou-stand" class="chara-stand mascot-stand" src="img/kodou01.png">
     </div>
-
     <div id="msg-window" onclick="nextScene()">
-        <div id="speaker-name" style="font-weight:bold; color:var(--cyber-blue); margin-bottom:8px; padding-left:22px; position:relative;"></div>
+        <div id="speaker-name" style="font-weight:bold; color:var(--cyber-blue); margin-bottom:8px; height:1.2em;"></div>
         <div id="message-text"></div>
     </div>
 </div>
 
 <script>
-    const SECRET_KEY = "2026"; 
+    const SECRET_KEY = "2026";
     const bgm = document.getElementById('bgm');
     const fader = document.getElementById('fader');
     const gpsLayer = document.getElementById('gps-layer');
-
-    let currentStep = 0;
-    let isTyping = false;
-    let typingTimer;
-    let chatHistory = [];
-    let unlockedNotes = [];
-
-    const scenario = [
-        // --- 第1章：導入 ---
-        { name: "ハルト", text: "「……OSAKA。ネオンの海と、牙をむくような技術がひしめき合う、僕の街」", chara: "none", bg: "haikei01" },
-        { name: "ハルト", text: "「こいつは『コドウ』。……ロボット工学の第一人者であるお父さんが、NASAへ行く前に僕にくれた、特別な相棒」", chara: "haruto_kodou", bg: "haikei01" },
-        { name: "コドウ", text: "「（和風な電子音で）ドン！ ハルト、今日の調子はどう？」", chara: "kodou", bg: "haikei01" },
-        { name: "ハルト", text: "「今日は特別なメンテナンスをして、コドウをパワーアップさせて父さんを驚かせてやるんだ。」", chara: "haruto", bg: "bg_haruto_room" },
-        { name: "システム", text: "（ハルト、ヘッドホンを装着し、メンテナンスを開始する）", chara: "haruto_kodou", bg: "bg_haruto_room" },
-        { name: "システム", text: "（画面フラッシュ ＆ エラーSE音演出）", chara: "none", bg: "bg_haruto_room", effect: "error" },
-        { name: "ハルト", text: "「え……？ コドウ……？ 嘘だろ、待ってよ……！」", chara: "haruto", bg: "bg_haruto_room" },
-        { name: "謎の男", text: "「……高出力ユニットの負荷テスト……コンマ05の誤差で、これほどのズレが出るとはな。『エネルギー変換効率』を過信しすぎたか。」", chara: "kage", bg: "bg_haruto_room" },
-        { name: "ハルト", text: "「誰だ！？ コドウに触るな！」", chara: "haruto", bg: "bg_haruto_room" },
-        { name: "謎の男", text: "「……静かにしてくれ。……急がなければ。」", chara: "kage", bg: "bg_haruto_room" },
-        { name: "システム", text: "（謎の男がコドウを抱え、窓から夜の街へ消えていく）", chara: "none", bg: "bg_haruto_room" },
-        { name: "ハルト", text: "「……そんな、嘘だろ。……コドウ……。僕の大事な、たった一人の相棒なのに……」", chara: "haruto", bg: "bg_haruto_room" },
-        { name: "父の声（回想）", text: "『いいか、ハルト。こいつは世界一のロボットだ。宇宙の果てでも、私とお前を繋いでくれる。……迷子になんて、絶対にならないさ』", chara: "none", bg: "bg_haruto_room" },
-        { name: "ハルト", text: "「（ノートをひっ掴む）……そうだ。お父さん、言ってたじゃないか。……『迷子にならない』って。……まさか！」", chara: "haruto", bg: "bg_haruto_room" },
-        { name: "ハルト", text: "「（端末を起動）……あった！ 高精度GPSユニット……！ お父さん、コドウのコアの奥に、こんなものまで組み込んでたのか！」", chara: "haruto", bg: "bg_haruto_room" },
-        { name: "ハルト", text: "「（ノートをめくる）……落ち着け。絶対に、僕でも辿り着けるように『鍵』を隠してるはずだ。……これだ！」", chara: "haruto", bg: "bg_haruto_room", note: { id: "n1", title: "父の開発ノート", body: "コドウ内蔵のGPS。ロック解除の鍵がノートの図形に隠されていた。" } },
-        { name: "ハルト", text: "「……よし、通った！ コドウの信号をキャッチしたぞ。……『OSAKA中央駅』？ あいつ、駅へ向かってるのか！」", chara: "haruto", bg: "bg_haruto_room", effect: "gps", loc: "Neo-Osaka-ST" },
-        { name: "システム", text: "（SE：駅の雑踏と、重厚なゲートが閉まる音）", chara: "none", bg: "bg_station" },
-        { name: "ハルト", text: "「ハァ、ハァ……！ やっと着いた。……って、ゲートが閉まった……！？ くそっ、あいつが強引に突破したせいで……！」", chara: "haruto", bg: "bg_station" },
-        { name: "駅アナウンス", text: "『警告。システムを警戒モードへ移行します。復旧には管理パスワードが必要です』", chara: "none", bg: "bg_station" },
-        { name: "ハルト", text: "「（信号を確認）方向は……北。……この先にあるのは、KYOTOか！」", chara: "haruto", bg: "bg_station" },
-        { name: "ハルト", text: "「……よし、やるしかない。父さんの残した『緊急解除コードのメモ』を解析するんだ！」", chara: "haruto", bg: "bg_station", note: { id: "n2", title: "緊急解除コード", body: "リニア『ツルギ』を起動させるための父のメモ。" } },
-        { name: "ハルト", text: "「……よし、承認された！ システムリブート！ いけ……動けッ！！」", chara: "haruto", bg: "bg_station" },
-        { name: "システム", text: "（SE：駆動音と共に画面が激しくフラッシュ）", chara: "none", bg: "bg_linear", effect: "success" },
-        { name: "駅アナウンス", text: "『管理コード承認。ゲートを開きます。機体「ツルギ」、緊急シークエンスを解除。目的地：KYOTO』", chara: "none", bg: "bg_linear" },
-        { name: "ハルト", text: "「目的地は京都だ。……待ってろよ、コドウ。必ず、僕が助け出すから」", chara: "haruto", bg: "bg_linear", videoTrigger: true },
-
-        // --- 第2章：旧・京都研究所への道 ---
-        { name: "ハルト", text: "「（京都駅に到着して）……ここが、KYOTO。……この霧、ただの霧じゃない。ナノマシンのノイズだ。GPSが位置を特定できない！」", chara: "haruto", bg: "bg_kyoto_station" },
-        { name: "ハルト", text: "「（ノートを照らし合わせる）分かったぞ、店の名前は『八百万ジャンク』だ！」", chara: "haruto", bg: "bg_kyoto_station", note: { id: "n3", title: "八百万ビット・ストリート", body: "ナノマシンの霧に包まれた京都の電脳街。" } },
-        { name: "ハルト", text: "「はぁ、はぁ……捕まえたぞ。……さあ、コドウを返せ！ 今すぐだ！」", chara: "haruto", bg: "bg_cyber_shop" },
-        { name: "謎の男", text: "「（ゆっくりと振り返り）……悪いな。だが、こいつはまだ返せない。」", chara: "kage", bg: "bg_cyber_shop" },
-        { name: "ハルト", text: "「返せない！？ 勝手なことを言うな！ 僕の相棒だ、お前に触られる筋合いはない！」", chara: "haruto", bg: "bg_cyber_shop" },
-        { name: "謎の男", text: "「……ふっ。いや、案外そうでも無いかもしれんぞ」", chara: "kage", bg: "bg_cyber_shop" },
-        { name: "ハルト", text: "「は！？何言ってんだよ……？ お前、一体何者なんだ？」", chara: "haruto", bg: "bg_cyber_shop" },
-        { name: "警備ドローン", text: "『……目標発見。ハルト……ハルト・アマツを確認』", chara: "none", bg: "bg_cyber_shop", effect: "error" },
-        { name: "ハルト", text: "「っ！？ なんだこいつら……！？ なんで、なんで僕の名前を知ってるんだよ！」", chara: "haruto", bg: "bg_cyber_shop" },
-        { name: "ハルト", text: "「……そうか、お前の差し金か。こいつらを使って、僕を待ち伏せしてたのか！」", chara: "haruto", bg: "bg_cyber_shop" },
-        { name: "謎の男", text: "「……そいつらは警備用のドローン『ヤタガラス』だ。気をつけたほうがいいぜ」", chara: "kage", bg: "bg_cyber_shop" },
-        { name: "謎の男", text: "「弾はゴム製だが、まともに食らえば骨の二、三本は覚悟しなきゃならない」", chara: "kage", bg: "bg_cyber_shop" },
-        { name: "ハルト", text: "「……っ、脅しのつもりかよ！ 自分の仲間の性能を自慢しに来たのか！？」", chara: "haruto", bg: "bg_cyber_shop" },
-        { name: "謎の男", text: "「……自慢じゃない。……事実を言ったまでだ」", chara: "kage", bg: "bg_cyber_shop" },
-        { name: "謎の男", text: "「……すまないが、まだ返せない。……こいつは連れていく」", chara: "kage", bg: "bg_cyber_shop" },
-        { name: "ハルト", text: "「待て！ 行かせるかよ！」", chara: "haruto", bg: "bg_cyber_shop" },
-        { name: "謎の男", text: "「……取り戻したければ、来い。……かつて、こいつが生まれた、あの場所に」", chara: "kage", bg: "bg_cyber_shop" },
-        { name: "ハルト", text: "「……っ！？ 『コドウが生まれた場所』……？ 、どういうことだ！？」", chara: "haruto", bg: "bg_cyber_shop" },
-        { name: "謎の男", text: "「……詳しい場所は、そのノートを見れば思い出すはずだ。……そこで待っている」", chara: "kage", bg: "bg_cyber_shop" },
-        { name: "システム", text: "（ヤタガラスと共に、謎の男が逃走していく）", chara: "none", bg: "bg_cyber_shop" },
-        { name: "ハルト", text: "「……あいつ、ドローンを操ってやがった。……それにしても……あいつ、一体何が目的なんだ……？」", chara: "haruto", bg: "bg_cyber_shop" },
-        { name: "システム", text: "（ハルトは、ノートの隠し地図が指し示す場所へと進む）", chara: "none", bg: "bg_old_lab" },
-        { name: "ハルト", text: "「（息を切らしながら）……ここだ。お父さんの旧・京都研究所。……間違いない、幼い頃に一度だけ連れてきてもらった、あの風景だ」", chara: "haruto", bg: "bg_old_lab" },
-        { name: "ハルト", text: "「……それにしても。……あいつ、どうして『ここ』を知っていたんだ？」", chara: "haruto", bg: "bg_old_lab" },
-        { name: "ハルト", text: "「（立ち止まり、空を見上げる）……まさか。……あいつが、本当にお父さん……？ ……いや、そんなはずはない。でも、もしそうなら……どうしてあんな強引な真似を……」", chara: "haruto", bg: "bg_old_lab" },
-        { name: "ハルト", text: "「（周囲を見渡して）……誰もいない。……ハァ、ハァ……！ コドウ！ どこだ！ 返事をしてくれ！」", chara: "haruto", bg: "bg_old_lab" },
-        { name: "ハルト", text: "「（端末を見る）……くそっ、GPSの信号も完全に途切れてる。……あいつ、僕をからかったのか？」", chara: "haruto", bg: "bg_old_lab" },
-        { name: "ハルト", text: "「（力なく壁に背を預け、ずるずると座り込む）……全部、僕のせいだ。……ごめんな、コドウ」", chara: "haruto", bg: "bg_old_lab" },
-        { name: "ハルト", text: "「……お前がいてくれたから、お父さんがいなくても寂しくなかったんだ。……お前のあの、変な太鼓のリズム……。……もう一度、聞かせてくれよ……」", chara: "haruto", bg: "bg_old_lab" },
-        { name: "システム", text: "（SE：聞き慣れた独特なリズムが響き始める）", chara: "none", bg: "bg_old_lab" },
-        { name: "ハルト", text: "「（顔を上げる）……え？ ……この音、まさか……」", chara: "haruto", bg: "bg_old_lab" },
-        { name: "コドウ", text: "「（和風な電子音で）ドン！ カカッ！ ……ハルト、遅いよ！ 待ちくたびれちゃった！」", chara: "kodou", bg: "bg_old_lab" },
-        { name: "ハルト", text: "「（目を見開き, 駆け寄る）……コドウ！ ……怪我はないか？」", chara: "haruto_kodou", bg: "bg_old_lab" },
-        { name: "コドウ", text: "「全然平気！ なんだか体が、前よりずっと軽くなったみたいだよ！」", chara: "kodou", bg: "bg_old_lab" },
-        { name: "ハルト", text: "「……よかった。……本当によかった……！」", chara: "haruto_kodou", bg: "bg_old_lab" },
-        { name: "ハルト", text: "「……でも、あいつは……？ あの男はどこへ行ったんだ……？」", chara: "haruto", bg: "bg_old_lab" },
-        { name: "ハルト", text: "「……なあ、コドウ。あの男はどこへ行った？ あいつ、お前に何をしたんだ！？」", chara: "haruto", bg: "bg_old_lab" },
-        { name: "コドウ", text: "「……わかんないよ、ハルト。気がついたら、ここでハルトを待ってたんだ」", chara: "kodou", bg: "bg_old_lab" },
-        { name: "ハルト", text: "「……おかしい。僕の知っているコドウなら、こんなに黙り込んだりしないはずだ。……まさか、こいつ……本当に僕の知っている『コドウ』なのか？ 中身を……書き換えられたり、すり替えられたりしてないか……？」", chara: "haruto", bg: "bg_old_lab" },
-        { name: "システム", text: "（SE：ヤタガラスの鋭い飛行音）", chara: "none", bg: "bg_old_lab", effect: "error" },
-        { name: "ハルト", text: "「……っ！ しまった、さっきのドローンだ！ やっぱりあいつの仲間が追ってきてたのか！」", chara: "haruto", bg: "bg_old_lab" },
-        { name: "ハルト", text: "「……くそっ、考えるのは後だ。コドウ、行くぞ！ ここから出るんだ！」", chara: "haruto_kodou", bg: "bg_old_lab" },
-        { name: "コドウ", text: "「（一瞬だけ奥の暗闇を振り返り、ハルトの後に続く）……うん、行こう！」", chara: "kodou", bg: "bg_old_lab" },
-
-        // --- 第3章：空中庭園・偶然の遭遇と真実 ---
-        { name: "ハルト", text: "「（走りながら）……はぁ、はぁ……！ どこまで追ってくるんだよ！」", chara: "haruto_kodou", bg: "bg_sky_garden" },
-        { name: "ハルト", text: "「……っ！？ 嘘だろ, あいつ……カゲじゃないか。なんでこんなところに……」", chara: "haruto", bg: "bg_sky_garden" },
-        { name: "ドローン", text: "『……警告。抵抗を止め、直ちにあの個体を渡せ。データを差し出せば、命までは取らん』", chara: "none", bg: "bg_sky_garden" },
-        { name: "謎の男", text: "「（膝をつき、端末を庇いながら）……断る。……コドウを、人殺しの道具には……させない……！」", chara: "kage", bg: "bg_sky_garden" },
-        { name: "ハルト", text: "「……あいつ、攻撃されてる……？ ドローンの仲間じゃなかったのか」", chara: "haruto", bg: "bg_sky_garden" },
-        { name: "コドウ", text: "「ドン……。ハルト、お願い、助けてあげて。……この人、悪い人じゃないよ」", chara: "kodou", bg: "bg_sky_garden" },
-        { name: "ハルト", text: "「コドウ……？」", chara: "haruto", bg: "bg_sky_garden" },
-        { name: "コドウ", text: "「さっきの研究所でね、僕の壊れかけてた回路を、この人が一生懸命直してくれたんだ。お父さんみたいに、ずっと、ずっと優しく……」", chara: "kodou", bg: "bg_sky_garden" },
-        { name: "ハルト", text: "「（決意を固め、叫ぶ）そこまでだ！ ……コドウ、いけっ！！」", chara: "haruto_kodou", bg: "bg_sky_garden" },
-        { name: "謎の男", text: "「……ハルト！？ なぜここに……！ 来るなと言ったはずだ……！」", chara: "kage", bg: "bg_sky_garden" },
-        { name: "ハルト", text: "「たまたま通りかかっただけだよ！ ……借りは返す。コドウがそう言うなら、信じてやる！」", chara: "haruto", bg: "bg_sky_garden" },
-        { name: "謎の男", text: "「……フッ。なら、口を動かす前に手を動かせ！俺が時間を稼ぐ。ドローンのセキュリティに侵入して、全機墜落させるんだ！」", chara: "kage", bg: "bg_sky_garden" },
-        { name: "謎の男", text: "「アマツ博士の研究ノートを見るんだ！ 救助用プロトコル……『モード：アルファ』を強制展開しろ！」", chara: "kage", bg: "bg_sky_garden" },
-        { name: "ハルト", text: "「（ノートを必死にめくり、コードを叩き込む）モード：アルファ……これか！ よし、いけっ！！」", chara: "haruto", bg: "bg_sky_garden", effect: "success" },
-        { name: "システム音声", text: "『警告。不正なアクセスを検知。防衛プロトコルが暴走モードへ移行します。自爆シークエンス開始』", chara: "none", bg: "bg_sky_garden", effect: "error" },
-        { name: "ハルト", text: "「なっ……！？ 嘘だろ、墜落どころか自爆……！？」", chara: "haruto", bg: "bg_sky_garden" },
-        { name: "謎の男", text: "「……バカな、モード：アルファが拒絶された……！？」", chara: "kage", bg: "bg_sky_garden" },
-        { name: "ハルト", text: "「計算違いかよ！ お父さん気取りで偉そうに指示しといて、大外れじゃねーか！ 解除キー、解除キーはどこだ……！？」", chara: "haruto", bg: "bg_sky_garden" },
-
-        // --- シーン：自爆阻止とその後 ---
-        { name: "システム", text: "（SE：制限時間ギリギリでハルトがキーを入力。ドローンが沈黙する）", chara: "none", bg: "bg_sky_garden", effect: "success" },
-        { name: "ハルト", text: "「……はぁ、はぁ……。……止まった……」", chara: "haruto", bg: "bg_sky_garden" },
-        { name: "謎の男", text: "「……フッ。……よくやったな、ハルト。……助かったよ」", chara: "kage", bg: "bg_sky_garden" },
-        { name: "ハルト", text: "「『助かったよ』じゃないだろ！ お前、お父さんのプロトコルが通用するかどうかも分かってなかったのか？」", chara: "haruto", bg: "bg_sky_garden" },
-        { name: "謎の男", text: "「……いや、完全に俺のミスだ。博士の設計を、この時代の奴らがここまで歪めて運用してるとは思わなかった」", chara: "kage", bg: "bg_sky_garden" },
-        { name: "ハルト", text: "「詰めが甘いんだよ。しっかりしなよ、エンジニア失格だぞ」", chara: "haruto", bg: "bg_sky_garden" },
-        { name: "謎の男", text: "「……そうだな。……全く、その通りだ。……手厳しいな、お前は」", chara: "kage", bg: "bg_sky_garden" },
-        { name: "ハルト", text: "「本当のことだろ。……次はもっと、ちゃんとやってくれよ」", chara: "haruto", bg: "bg_sky_garden" },
-        { name: "謎の男", text: "「……ああ、約束する。だからハルト、お前も今のその言葉、しっかりと覚えておいてくれ。……『詰めを甘くするな』。……」", chara: "kage", bg: "bg_sky_garden" },
-
-        // --- エピローグ：夜明けの残響 ---
-        { name: "システム", text: "（SE：遠ざかるリニアの駆動音。空中庭園には、夜明け前の冷たい風の音だけが残っている）", chara: "none", bg: "bg_dawn" },
-        { name: "ハルト（未来）", text: "「（去りゆくハルトたちの背中を見送り、ふっと力を抜く）……ふぅ。……全く、相変わらず口の減らないガキだ」", chara: "kage", bg: "bg_dawn" },
-        { name: "システム", text: "（カゲ、ヘルメットを外す。現れたのは、数年後のハルトと同じ瞳を持った青年の姿だった）", chara: "kage", bg: "bg_dawn" },
-        { name: "ハルト（未来）", text: "「（透け始めた手を見つめて、静かに笑う）……よし、計算通りだな。……歴史が書き換わり始めたようだ。」", chara: "kage", bg: "bg_dawn" },
-        { name: "ハルト（未来）", text: "「（壊れたドローンの残骸を見下ろし）この型番！？、……そういうとか。……僕のいた未来のドローンじゃない。もっと先の未来。」", chara: "kage", bg: "bg_dawn" },
-        { name: "ハルト（未来）", text: "「……歴史の修正を阻もうと追ってきたということか。……でも、それももう終わりだ。」", chara: "kage", bg: "bg_dawn" },
-        { name: "システム", text: "（ハルトと同じように消えかかるドローン）", chara: "none", bg: "bg_dawn" },
-        { name: "ハルト（未来）", text: "「これで燃料切れで置いたきたバイク型のタイムマシンも消えてくれるだろう」", chara: "kage", bg: "bg_dawn" },
-        { name: "ハルト（未来）", text: "「……お前がエラーを出したあの瞬間に、毒を取り除く。……それ以外に、あの地獄のような未来を消し去る方法はなかった。」", chara: "kage", bg: "bg_dawn" },
-        { name: "ハルト（未来）", text: "「お前のメンテナンスによってコドウのプログラムが進化し、軍事技術に転用され、……多くの命が犠牲になるんだ。」", chara: "kage", bg: "bg_dawn" },
-        { name: "ハルト（未来）", text: "「それもこれでおしまいだ。もうあの未来にはつながらない」", chara: "kage", bg: "bg_dawn" },
-        { name: "システム", text: "（ハルト（未来）の体が、朝日に溶けるように、激しく光の粒子となって散り始める）", chara: "none", bg: "bg_dawn", effect: "success" },
-        { name: "ハルト（未来）", text: "「（微笑んで）……『エンジニア失格』か。……ああ、その通りだよ。……お前がこれから創る、新しい未来に……。」", chara: "kage", bg: "bg_dawn" },
-        { name: "ハルト（未来）", text: "「未来を頼んだぞ……」", chara: "kage", bg: "bg_dawn" },
-        { name: "システム", text: "―― THE END ――", chara: "none", bg: "bg_dawn" }
-    ];
+    let currentStep = 0, isTyping = false, typingTimer, chatHistory = [], unlockedNotes = [];
 
     function checkPassword() {
-        const field = document.getElementById('pw-field');
-        if (field.value === SECRET_KEY) {
+        if (document.getElementById('pw-field').value === SECRET_KEY) {
             document.getElementById('password-screen').style.display = 'none';
             document.getElementById('game-container').style.display = 'flex';
-            loadGame(); 
-        } else { 
-            alert("認証エラー"); field.value = "";
-        }
+            loadGame();
+        } else { alert("認証エラー"); }
     }
 
     function startGame() {
         document.getElementById('title-screen').style.display = 'none';
         document.getElementById('msg-window').style.display = 'block';
-        bgm.play().catch(e => {});
+        bgm.play().catch(()=>{});
         showText();
     }
 
     function playOpeningVideo() {
         saveGame();
         fader.classList.add('active');
-        setTimeout(() => {
-            window.location.href = "video.html";
-        }, 1500);
+        setTimeout(() => { window.location.href = "video.html"; }, 1500);
     }
 
     function showText() {
@@ -331,111 +120,221 @@
         const data = scenario[currentStep];
         if (data.note && !unlockedNotes.some(n => n.id === data.note.id)) unlockedNotes.push(data.note);
         
-        const nameEl = document.getElementById('speaker-name');
-        const textEl = document.getElementById('message-text');
+        const nameEl = document.getElementById('speaker-name'), textEl = document.getElementById('message-text');
         chatHistory.push({ name: data.name, text: data.text });
-        
-        nameEl.innerText = (data.name === "システム" || data.name === "システム音声" || data.name === "駅アナウンス") ? "" : data.name;
-        nameEl.style.display = (nameEl.innerText === "") ? "none" : "block";
-        textEl.innerText = "";
-        isTyping = true;
-        updateVisuals(data);
-        saveGame(); 
+        nameEl.innerText = (data.name === "システム" || data.name === "駅アナウンス" || data.name === "システム音声") ? "" : data.name;
+        textEl.innerText = ""; isTyping = true;
+        updateVisuals(data); saveGame();
 
-        let i = 0;
-        clearInterval(typingTimer);
+        let i = 0; clearInterval(typingTimer);
         typingTimer = setInterval(() => {
-            if (i < data.text.length) {
-                textEl.innerText += data.text.charAt(i++);
-            } else { 
+            if (i < data.text.length) { textEl.innerText += data.text.charAt(i++); }
+            else { 
                 clearInterval(typingTimer); isTyping = false; 
-                if (data.videoTrigger) {
-                    setTimeout(playOpeningVideo, 1000);
-                }
+                if (data.videoTrigger) { setTimeout(playOpeningVideo, 1200); }
             }
         }, 40);
     }
 
     function updateVisuals(data) {
-        const bgArea = document.getElementById('bg-area');
-        const hImg = document.getElementById('haruto-stand');
-        const kImg = document.getElementById('kage-stand');
-        const dImg = document.getElementById('kodou-stand');
-        hImg.style.display = "none"; kImg.style.display = "none"; dImg.style.display = "none";
-        gpsLayer.style.display = "none";
-        
-        if (data.chara === "haruto") hImg.style.display = "block";
-        else if (data.chara === "kage") kImg.style.display = "block";
-        else if (data.chara === "kodou") dImg.style.display = "block";
-        else if (data.chara === "haruto_kodou") { hImg.style.display = "block"; dImg.style.display = "block"; }
-        
-        if (data.bg) bgArea.style.backgroundImage = `url('img/${data.bg}.png')`;
-        
+        if (data.bg) document.getElementById('bg-area').style.backgroundImage = `url('img/${data.bg}.png')`;
+        document.getElementById('haruto-stand').style.display = "none";
+        document.getElementById('kage-stand').style.display = "none";
+        document.getElementById('kodou-stand').style.display = "none";
+        gpsLayer.style.display = (data.effect === "gps") ? "flex" : "none";
+        if (data.loc) document.getElementById('loc-text').innerText = data.loc;
+        if (data.chara === "haruto") document.getElementById('haruto-stand').style.display = "block";
+        if (data.chara === "kage") document.getElementById('kage-stand').style.display = "block";
+        if (data.chara === "kodou") document.getElementById('kodou-stand').style.display = "block";
+        if (data.chara === "haruto_kodou") { document.getElementById('haruto-stand').style.display = "block"; document.getElementById('kodou-stand').style.display = "block"; }
         const layer = document.getElementById('effect-layer');
-        if (data.effect === "error") {
-            layer.classList.add('flash-red');
-            setTimeout(() => layer.classList.remove('flash-red'), 300);
-        } else if (data.effect === "success") {
-            layer.classList.add('flash-green');
-            setTimeout(() => layer.classList.remove('flash-green'), 400);
-        } else if (data.effect === "gps") {
-            gpsLayer.style.display = "flex";
-            if (data.loc) document.getElementById('radar-loc-text').innerText = data.loc;
-        }
+        if (data.effect === "error") { layer.classList.add('flash-red'); setTimeout(()=>layer.classList.remove('flash-red'), 300); }
+        if (data.effect === "success") { layer.classList.add('flash-green'); setTimeout(()=>layer.classList.remove('flash-green'), 400); }
     }
 
     function nextScene() {
-        if (isTyping) {
-            clearInterval(typingTimer);
-            document.getElementById('message-text').innerText = scenario[currentStep].text;
-            isTyping = false;
-            return;
-        }
-        if (scenario[currentStep].videoTrigger) return;
-        currentStep++;
-        showText();
+        if (isTyping) { clearInterval(typingTimer); document.getElementById('message-text').innerText = scenario[currentStep].text; isTyping = false; return; }
+        if (scenario[currentStep].videoTrigger) { playOpeningVideo(); return; }
+        currentStep++; showText();
     }
 
     function openNote() {
-        const noteContent = document.getElementById('note-content');
-        noteContent.innerHTML = unlockedNotes.length ? unlockedNotes.map(n => `<div class="note-item"><div class="note-title">■ ${n.title}</div><div class="note-body">${n.body}</div></div>`).reverse().join('') : "<p>記録なし</p>";
+        document.getElementById('note-content').innerHTML = unlockedNotes.map(n => `<div class="note-item"><div class="note-title">■ ${n.title}</div><div class="note-body">${n.body}</div></div>`).reverse().join('');
         document.getElementById('note-screen').style.display = 'flex';
     }
     function closeNote() { document.getElementById('note-screen').style.display = 'none'; }
-    function openLog() {
-        const logContent = document.getElementById('log-content');
-        logContent.innerHTML = chatHistory.map(h => `<div><b style="color:var(--cyber-blue);">${h.name}</b><br>${h.text}</div>`).join('');
-        document.getElementById('log-screen').style.display = 'flex';
-    }
+    function openLog() { document.getElementById('log-content').innerHTML = chatHistory.map(h => `<div><b>${h.name}</b>: ${h.text}</div>`).join(''); document.getElementById('log-screen').style.display = 'flex'; }
     function closeLog() { document.getElementById('log-screen').style.display = 'none'; }
-    function resetGame() { if (confirm("リセット？")) { localStorage.removeItem('cyber_puzzle_save'); location.reload(); } }
-    function toggleMute() { bgm.muted = !bgm.muted; document.getElementById('mute-btn').innerText = bgm.muted ? "🔇" : "🔊"; saveGame(); }
-    function saveGame() { localStorage.setItem('cyber_puzzle_save', JSON.stringify({ step: currentStep, history: chatHistory, notes: unlockedNotes, muted: bgm.muted })); }
+    function resetGame() { if(confirm("RESET?")) { localStorage.removeItem('cyber_puzzle_save'); location.reload(); } }
+    
+    function toggleMute() { 
+        bgm.muted = !bgm.muted; 
+        document.getElementById('mute-btn').innerText = bgm.muted ? "🔇" : "🔊"; 
+        saveGame(); 
+    }
+
+    function saveGame() { 
+        localStorage.setItem('cyber_puzzle_save', JSON.stringify({ 
+            step: currentStep, 
+            history: chatHistory, 
+            notes: unlockedNotes,
+            muted: bgm.muted
+        })); 
+    }
     
     function loadGame() {
         const saved = localStorage.getItem('cyber_puzzle_save');
         if (saved) {
-            const data = JSON.parse(saved);
-            currentStep = data.step; chatHistory = data.history; unlockedNotes = data.notes; bgm.muted = data.muted;
-            document.getElementById('mute-btn').innerText = bgm.muted ? "🔇" : "🔊";
+            const data = JSON.parse(saved); 
+            currentStep = data.step; 
+            chatHistory = data.history; 
+            unlockedNotes = data.notes;
+            if (data.muted !== undefined) {
+                bgm.muted = data.muted;
+                document.getElementById('mute-btn').innerText = bgm.muted ? "🔇" : "🔊";
+            }
             if (currentStep > 0) document.getElementById('start-btn').innerText = "CONTINUE";
         }
     }
 
-    window.onload = () => {
+    window.addEventListener('DOMContentLoaded', () => {
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('mode') === 'after_video') {
-            loadGame();
-            document.getElementById('password-screen').style.display = 'none';
-            document.getElementById('title-screen').style.display = 'none';
+            const saved = localStorage.getItem('cyber_puzzle_save');
+            if (saved) {
+                const data = JSON.parse(saved);
+                currentStep = data.step; chatHistory = data.history; unlockedNotes = data.notes;
+                bgm.muted = data.muted || false;
+            }
+            document.getElementById('password-screen').remove();
+            document.getElementById('title-screen').remove();
             document.getElementById('game-container').style.display = 'flex';
             document.getElementById('msg-window').style.display = 'block';
-            bgm.play().catch(e=>{});
+            document.getElementById('mute-btn').innerText = bgm.muted ? "🔇" : "🔊";
             currentStep++; 
+            bgm.play().catch(()=>{});
             showText();
         }
-    };
-</script>
+    });
 
+    const scenario = [
+        { name: "ハルト", text: "「……OSAKA。ネオンの海と、牙をむくような技術がひしめき合う、僕の街」", bg: "haikei01" },
+        { name: "ハルト", text: "「こいつは『コドウ』。……ロボット工学の第一人者であるお父さんが、NASAへ行く前に僕にくれた、特別な相棒」", chara: "haruto_kodou" },
+        { name: "コドウ", text: "「（和風な電子音で）ドン！ ハルト、今日の調子はどう？」", chara: "kodou" },
+        { name: "ハルト", text: "「今日は特別なメンテナンスをして、コドウをパワーアップさせて父さんを驚かせてやるんだ。」", chara: "haruto" },
+        { name: "システム", text: "（ハルト、ヘッドホンを装着し、メンテナンスを開始する）", chara: "haruto_kodou", bg: "bg_haruto_room" },
+        { name: "システム", text: "（画面フラッシュ ＆ エラーSE音演出）", effect: "error" },
+        { name: "ハルト", text: "「え……？ コドウ……？ 嘘だろ、待ってよ……！」", chara: "haruto" },
+        { name: "謎の男", text: "「……高出力ユニットの負荷テスト……コンマ05の誤差で、これほどのズレが出るとはな。『エネルギー変換効率』を過信しすぎたか。」", chara: "kage" },
+        { name: "ハルト", text: "「誰だ！？ コドウに触るな！」", chara: "haruto" },
+        { name: "謎の男", text: "「……静かにしてくれ。……急がなければ。」", chara: "kage" },
+        { name: "システム", text: "（謎の男がコドウを抱え、窓から夜の街へ消えていく）" },
+        { name: "ハルト", text: "「……そんな、嘘だろ。……コドウ……。僕の大事な,たった一人の相棒なのに……」", chara: "haruto" },
+        { name: "父の声（回想）", text: "『いいか、ハルト。こいつは世界一のロボットだ。宇宙の果てでも、私とお前を繋いでくれる。……迷子になんて、絶対にならないさ』" },
+        { name: "ハルト", text: "「（ノートをひっ掴む）……そうだ。お父さん、言ってたじゃないか。……『迷子にならない』って。……まさか！」", chara: "haruto" },
+        { name: "ハルト", text: "「（端末を起動）……あった！ 高精度GPSユニット……！ お父さん、コドウのコアの奥に,こんなものまで組み込んでたのか！」", chara: "haruto" },
+        { name: "ハルト", text: "「（ノートをめくる）……落ち着け。絶対に、僕でも辿り着けるように『鍵』を隠してるはずだ。……これだ！」", chara: "haruto", note: { id: "n1", title: "父の開発ノート", body: "コドウ内蔵のGPS。ロック解除の鍵がノートの図形に隠されていた。" } },
+        { name: "ハルト", text: "「……よし、通った！ コドウの信号をキャッチしたぞ。……『OSAKA中央駅』？ あいつ、駅へ向かってるのか！」", effect: "gps", loc: "Neo-Osaka-ST" },
+        { name: "システム", text: "（SE：駅の雑踏と、重厚なゲートが閉まる音）", bg: "bg_station" },
+        { name: "ハルト", text: "「ハァ、ハァ……！ やっと着いた。……って、ゲートが閉まった……！？ くそっ、あいつが強引に突破したせいで……！」", chara: "haruto" },
+        { name: "駅アナウンス", text: "『警告。システムを警戒モードへ移行します。復旧には管理パスワードが必要です』" },
+        { name: "ハルト", text: "「（信号を確認）方向は……北。……この先にあるのは、KYOTOか！」", chara: "haruto" },
+        { name: "ハルト", text: "「……よし,やるしかない。父さんの残した『緊急解除コードのメモ』を解析するんだ！」", note: { id: "n2", title: "緊急解除コード", body: "リニア『ツルギ』を起動させるための父のメモ。" } },
+        { name: "ハルト", text: "「……よし、承認された！ システムリブート！ いけ……動けッ！！」", chara: "haruto" },
+        { name: "システム", text: "（SE：駆動音と共に画面が激しくフラッシュ）", effect: "success" },
+        { name: "駅アナウンス", text: "『管理コード承認。ゲートを開きます。機体「ツルギ」、緊急シークエンスを解除。目的地：KYOTO』" },
+        { name: "ハルト", text: "「目的地は京都だ。……待ってろよ、コドウ。必ず、僕が助け出すから」", chara: "haruto", videoTrigger: true },
+        // 第2章：旧・京都研究所への道
+        { name: "ハルト", text: "「（京都駅に到着して）……ここが、KYOTO。……この霧、ただの霧じゃない。ナノマシンのノイズだ。GPSが位置を特定できない！」", bg: "bg_kyoto_station", chara: "haruto" },
+        { name: "ハルト", text: "「（ノートを照らし合わせる）分かったぞ、店の名前は『八百万ジャンク』だ！」", note: { id: "n3", title: "八百万ビット・ストリート", body: "京都の電脳街。" } },
+        { name: "ハルト", text: "「はぁ、はぁ……捕まえたぞ。……さあ、コドウを返せ！ 今すぐだ！」", bg: "bg_cyber_shop", chara: "haruto" },
+        { name: "謎の男", text: "「（ゆっくりと振り返り）……悪いな。だが,こいつはまだ返せない。」", chara: "kage" },
+        { name: "ハルト", text: "「返せない！？ 勝手なことを言うな！ 僕の相棒だ,お前に触られる筋合いはない！」", chara: "haruto" },
+        { name: "謎の男", text: "「……ふっ。いや,案外そうでも無いかもしれんぞ」", chara: "kage" },
+        { name: "ハルト", text: "「は！？何言ってんだよ……？ お前,一体何者なんだ？」", chara: "haruto" },
+        { name: "警備ドローン", text: "『……目標発見。ハルト……ハルト・アマツを確認』", effect: "error" },
+        { name: "ハルト", text: "「っ！？ なんだこいつら……！？ なんで,なんで僕の名前を知ってるんだよ！」", chara: "haruto" },
+        { name: "ハルト", text: "「……そうか,お前の差し金か。こいつらを使って,僕を待ち伏せしてたのか！」", chara: "haruto" },
+        { name: "謎の男", text: "「……そいつらは警備用のドローン『ヤタガラス』だ。気をつけたほうがいいぜ」", chara: "kage" },
+        { name: "謎の男", text: "「弾はゴム製だが,まともに食らえば骨の二,三本は覚悟しなきゃならない」", chara: "kage" },
+        { name: "ハルト", text: "「……っ,脅しのつもりかよ！ 自分の仲間の性能を自慢しに来たのか！？」", chara: "haruto" },
+        { name: "謎の男", text: "「……自慢じゃない。……事実を言ったまでだ」", chara: "kage" },
+        { name: "謎の男", text: "「……すまないが,まだ返せない。……こいつは連れていく」", chara: "kage" },
+        { name: "ハルト", text: "「待て！ 行かせるかよ！」", chara: "haruto" },
+        { name: "謎の男", text: "「……取り戻したければ,来い。……かつて,こいつが生まれた,あの場所に」", chara: "kage" },
+        { name: "ハルト", text: "「……っ！？ 『コドウが生まれた場所』……？ 、どういうことだ！？」", chara: "haruto" },
+        { name: "謎の男", text: "「……詳しい場所は,そのノートを見れば思い出すはずだ。……そこで待っている」", chara: "kage" },
+        { name: "システム", text: "（ヤタガラスと共に,謎の男が逃走していく）" },
+        { name: "ハルト", text: "「……あいつ,ドローンを操ってやがった。……それにしても……あいつ,一体何が目的なんだ……？」", chara: "haruto" },
+        { name: "システム", text: "（ハルトは,ノートの隠し地図が指し示す場所へと進む）" },
+        { name: "ハルト", text: "「（息を切らしながら）……ここだ。お父さんの旧・京都研究所。……間違いない、幼い頃に一度だけ連れてきてもらった、あの風景だ」", bg: "bg_old_lab", chara: "haruto" },
+        { name: "ハルト", text: "「……それにしても。……あいつ,どうして『ここ』を知っていたんだ？」", chara: "haruto" },
+        { name: "ハルト", text: "「（立ち止まり、空を見上げる）……まさか。……あいつが,本当にお父さん……？ ……いや,そんなはずはない。でも,もしそうなら……どうしてあんな強引な真似を……」", chara: "haruto" },
+        { name: "ハルト", text: "「（周囲を見渡して）……誰もいない。……ハァ,ハァ……！ コドウ！ どこだ！ 返事をしてくれ！」", chara: "haruto" },
+        { name: "ハルト", text: "「（端末を見る）……くそっ,GPSの信号も完全に途切れてる。……あいつ,僕をからかったのか？」", chara: "haruto" },
+        { name: "ハルト", text: "「（力なく壁に背を預け、ずるずると座り込む）……全部、僕のせいだ。……ごめんな、コドウ」", chara: "haruto" },
+        { name: "ハルト", text: "「……お前がいてくれたから、お父さんがいなくても寂しくなかったんだ。……お前のあの、変な太鼓のリズム……。……もう一度、聞かせてくれよ……」", chara: "haruto" },
+        { name: "システム", text: "（SE：聞き慣れた独特なリズムが響き始める）" },
+        { name: "ハルト", text: "「（顔を上げる）……え？ ……この音、まさか……」", chara: "haruto" },
+        { name: "コドウ", text: "「（和風な電子音で）ドン！ カカッ！ ……ハルト、遅いよ！ 待ちくたびれちゃった！」", chara: "kodou" },
+        { name: "ハルト", text: "「（目を見開き, 駆け寄る）……コドウ！ ……怪がはないか？」", chara: "haruto_kodou" },
+        { name: "コドウ", text: "「全然平気！ なんだか体が、前よりずっと軽くなったみたいだよ！」", chara: "kodou" },
+        { name: "ハルト", text: "「……よかった。……本当によかった……！」", chara: "haruto_kodou" },
+        { name: "ハルト", text: "「……でも,あいつは……？ あの男はどこへ行ったんだ……？」", chara: "haruto" },
+        { name: "ハルト", text: "「……なあ,コドウ。あの男はどこへ行った？ あいつ,お前に何をしたんだ！？」", chara: "haruto" },
+        { name: "コドウ", text: "「……わかんないよ,ハルト。気がついたら,ここでハルトを待ってたんだ」", chara: "kodou" },
+        { name: "ハルト", text: "「……おかしい。僕の知っているコドウなら,こんなに黙り込んだりしないはずだ。……まさか,こいつ……本当に僕の知っている『コドウ』なのか？ 中身を……書き換えられたり、すり替えられたりしてないか……？」", chara: "haruto" },
+        { name: "システム", text: "（SE：ヤタガラスの鋭い飛行音）", effect: "error" },
+        { name: "ハルト", text: "「……っ！ しまった,さっきのドローンだ！ やっぱりあいつの仲間が追ってきてたのか！」", chara: "haruto" },
+        { name: "ハルト", text: "「……くそっ,考えるのは後だ。コドウ、行くぞ！ ここから出るんだ！」", chara: "haruto_kodou" },
+        { name: "コドウ", text: "「（一瞬だけ奥の暗闇を振り返り、ハルトの後に続く）……うん,行こう！」", chara: "kodou" },
+        // 第3章
+        { name: "ハルト", text: "「（走りながら）……はぁ,はぁ……！ どこまで追ってくるんだよ！」", bg: "bg_sky_garden", chara: "haruto_kodou" },
+        { name: "ハルト", text: "「……っ！？ 嘘だろ, あいつ……カゲじゃないか。なんでこんなところに……」", chara: "haruto" },
+        { name: "ドローン", text: "『……警告。抵抗を止め、直ちにあの個体を渡せ。データを差し出せば、命までは取らん』" },
+        { name: "謎の男", text: "「（膝をつき、端末を庇いながら）……断る。……コドウを,人殺しの道具には……させない……！」", chara: "kage" },
+        { name: "ハルト", text: "「……あいつ,攻撃されてる……？ ドローンの仲間じゃなかったのか」", chara: "haruto" },
+        { name: "コドウ", text: "「ドン……。ハルト、お願い,助けてあげて。……この人,悪い人じゃないよ」", chara: "kodou" },
+        { name: "ハルト", text: "「コドウ……？」", chara: "haruto" },
+        { name: "コドウ", text: "「さっきの研究所でね、僕の壊れかけてた回路を、この人が一生懸命直してくれたんだ。お父さんみたいに、ずっと、ずっと優しく……」", chara: "kodou" },
+        { name: "ハルト", text: "「（決意を固め、叫ぶ）そこまでだ！ ……コドウ,いけっ！！」", chara: "haruto_kodou" },
+        { name: "謎の男", text: "「……ハルト！？ なぜここに……！ 来るなと言ったはずだ……！」", chara: "kage" },
+        { name: "ハルト", text: "「たまたま通りかかっただけだよ！ ……借りは返す。コドウがそう言うなら,信じてやる！」", chara: "haruto" },
+        { name: "謎の男", text: "「……フッ。なら、口を動かす前に手を動かせ！俺が時間を稼ぐ。ドローンのセキュリティに侵入して、全機墜落させるんだ！」", chara: "kage" },
+        { name: "謎の男", text: "「アマツ博士の研究ノートを見るんだ！ 救助用プロトコル……『モード：アルファ』を強制展開しろ！」", chara: "kage" },
+        { name: "ハルト", text: "「（ノートを必死にめくり、コードを叩き込む）モード：アルファ……これか！ よし,いけっ！！」", effect: "success", chara: "haruto" },
+        { name: "システム", text: "（SE：システム承認音。一瞬、ドローンたちの動きが止まる）" },
+        { name: "ハルト", text: "「……止まった！ やったぞ,墜落しろッ！！」", chara: "haruto" },
+        { name: "システム音声", text: "『警告。不正なアクセスを検知。防衛プロトコルが暴走モードへ移行します。自爆シークエンス開始』", effect: "error" },
+        { name: "ハルト", text: "「なっ……！？ 嘘だろ, 墜落どころか自爆……！？」", chara: "haruto" },
+        { name: "謎の男", text: "「……バカな,モード：アルファが拒絶された……！？」", chara: "kage" },
+        { name: "ハルト", text: "「計算違いかよ！ お父さん気取りで偉そうに指示しといて、大外れじゃねーか！ 解除キー、解除キーはどこだ……！？」", chara: "haruto" },
+        { name: "システム", text: "（SE：制限時間ギリギリでハルトがキーを入力。ドローンが沈黙する）", effect: "success" },
+        { name: "ハルト", text: "「……はぁ,はぁ……。……止まった……」", chara: "haruto" },
+        { name: "謎の男", text: "「……フッ。……よくやったな,ハルト。……助かったよ」", chara: "kage" },
+        { name: "ハルト", text: "「『助かったよ』じゃないだろ！ お前,お父さんのプロトコルが通用するかどうかも分かってなかったのか？」", chara: "haruto" },
+        { name: "謎の男", text: "「……いや、完全に俺のミスだ。博士の設計を,この時代の奴らがここまで歪めて運用してるとは思わなかった」", chara: "kage" },
+        { name: "ハルト", text: "「詰めが甘いんだよ。しっかりしなよ,エンジニア失格だぞ」", chara: "haruto" },
+        { name: "謎の男", text: "「……そうだな。……全く,その通りだ。……手厳しいな,お前は」", chara: "kage" },
+        { name: "ハルト", text: "「本当のことだろ。……次はもっと,ちゃんとやってくれよ」", chara: "haruto" },
+        { name: "謎の男", text: "「……ああ,約束する。だからハルト,お前も今のその言葉,しっかりと覚えておいてくれ。……『詰めを甘くするな』。……」", chara: "kage" },
+        // エピローグ
+        { name: "システム", text: "（SE：遠ざかるリニアの駆動音。空中庭園には、壊れたドローンの残骸と、夜明け前の冷たい風の音だけが残っている）", bg: "bg_dawn" },
+        { name: "ハルト（未来）", text: "「（去りゆくハルトたちの背中を見送り、ふっと力を抜く）……ふぅ。……全く、相変わらず口の減らないガキだ」", chara: "kage" },
+        { name: "システム", text: "（カゲ、ヘルメットを外す。現れたのは、数年後のハルト……少し大人びた青年の姿だった）", chara: "kage" },
+        { name: "ハルト（未来）", text: "「（自分の透け始めた手を見つめて、静かに笑う）……よし、計算通りだな。……歴史が書き換わり始めたようだ。」", chara: "kage" },
+        { name: "ハルト（未来）", text: "「（壊れたドローンの残骸を見下ろし）この型番！？、……そういうとか。……僕のいた未来のドローンじゃない。もっと先の未来。」", chara: "kage" },
+        { name: "ハルト（未来）", text: "「……歴史の修正を阻もうと追ってきたということか。……でも,それももう終わりだ。」", chara: "kage" },
+        { name: "システム", text: "（ハルトと同じように消えかかるドローン）" },
+        { name: "ハルト（未来）", text: "「これで燃料切れで置いたきたバイク型のタイムマシンも消えてくれるだろう」", chara: "kage" },
+        { name: "ハルト（未来）", text: "「……お前がエラーを出したあの瞬間に、毒を取り除く。……それ以外に、あの地獄のような未来を消し去る方法はなかった。」", chara: "kage" },
+        { name: "ハルト（未来）", text: "「お前のメンテナンスによって偶発的ではあるがコドウのプログラムが劇的に進化をしてしまうのだ。……そしてそれは軍事技術に転用され、……多くの命が犠牲になるんだ。」", chara: "kage" },
+        { name: "ハルト（未来）", text: "「それもこれでおしまいだ。もうあの未来にはつながらない」", chara: "kage" },
+        { name: "システム", text: "（ハルト（未来）の体が、朝日に溶けるように、激しく光の粒子となって散り始める）", effect: "success" },
+        { name: "ハルト（未来）", text: "「（微笑んで）……『エンジニア失格』か。……ああ、その通りだよ。……お前がこれから創る、新しい未来に……。……『エンジニア失格』である僕は、もう必要ないんだ。」", chara: "kage" },
+        { name: "ハルト（未来）", text: "「未来を頼んだぞ……」", chara: "kage" },
+        { name: "システム", text: "―― THE END ――" }
+    ];
+</script>
 </body>
 </html>
