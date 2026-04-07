@@ -21,7 +21,16 @@
         
         #fader { position: absolute; inset: 0; background: #000; z-index: 8000; opacity: 0; pointer-events: none; transition: opacity 1.5s ease; }
         #fader.active { opacity: 1; pointer-events: auto; }
-        #bg-area { flex: 1; width: 100%; background-image: url('img/haikei01.png'); background-size: cover; background-position: center; position: relative; overflow: hidden; transition: background-image 0.5s ease; }
+
+        /* 背景表示設定：上端基準(top center)にして、縦長画像がウィンドウに隠れにくくします */
+        #bg-area { 
+            flex: 1; width: 100%; 
+            background-image: url('img/haikei01.jpg'); 
+            background-size: cover; 
+            background-position: center; 
+            position: relative; overflow: hidden; transition: background-image 0.5s ease; 
+        }
+
         .chara-stand { position: absolute; z-index: 2; display: none; filter: drop-shadow(0 0 15px #000); pointer-events: none; }
         .human-stand { height: 82%; bottom: -5px; left: 50%; transform: translateX(-50%); }
         .mascot-stand { height: 35%; bottom: 12%; left: auto; right: 25px; }
@@ -137,7 +146,8 @@
     }
 
     function updateVisuals(data) {
-        if (data.bg) document.getElementById('bg-area').style.backgroundImage = `url('img/${data.bg}.png')`;
+        // 全背景を .jpg で読み込むように統一
+        if (data.bg) document.getElementById('bg-area').style.backgroundImage = `url('img/${data.bg}.jpg')`;
         document.getElementById('haruto-stand').style.display = "none";
         document.getElementById('kage-stand').style.display = "none";
         document.getElementById('kodou-stand').style.display = "none";
@@ -165,8 +175,17 @@
     function closeNote() { document.getElementById('note-screen').style.display = 'none'; }
     function openLog() { document.getElementById('log-content').innerHTML = chatHistory.map(h => `<div><b>${h.name}</b>: ${h.text}</div>`).join(''); document.getElementById('log-screen').style.display = 'flex'; }
     function closeLog() { document.getElementById('log-screen').style.display = 'none'; }
-    function resetGame() { if(confirm("RESET?")) { localStorage.removeItem('cyber_puzzle_save'); location.reload(); } }
-    
+    // --- 修正されたリセット関数 ---
+    function resetGame() {
+        if (confirm("データをリセットして最初からやり直しますか？")) {
+            // セーブデータを完全に削除
+            localStorage.removeItem('cyber_puzzle_save');
+            
+            // 現在のURLパラメータ（mode=after_videoなど）をすべて破棄して、
+            // 純粋な index.html に遷移させることで完全に初期化する
+            window.location.href = window.location.pathname; 
+        }
+    }
     function toggleMute() { 
         bgm.muted = !bgm.muted; 
         document.getElementById('mute-btn').innerText = bgm.muted ? "🔇" : "🔊"; 
@@ -222,7 +241,7 @@
         { name: "ハルト", text: "「こいつは『コドウ』。……ロボット工学の第一人者であるお父さんが、NASAへ行く前に僕にくれた、特別な相棒」", chara: "haruto_kodou" },
         { name: "コドウ", text: "「（和風な電子音で）ドン！ ハルト、今日の調子はどう？」", chara: "kodou" },
         { name: "ハルト", text: "「今日は特別なメンテナンスをして、コドウをパワーアップさせて父さんを驚かせてやるんだ。」", chara: "haruto" },
-        { name: "システム", text: "（ハルト、ヘッドホンを装着し、メンテナンスを開始する）", chara: "haruto_kodou", bg: "bg_haruto_room" },
+        { name: "システム", text: "（ハルト、ヘッドホンを装着し、メンテナンスを開始する）", chara: "haruto_kodou", bg: "haikei01" },
         { name: "システム", text: "（画面フラッシュ ＆ エラーSE音演出）", effect: "error" },
         { name: "ハルト", text: "「え……？ コドウ……？ 嘘だろ、待ってよ……！」", chara: "haruto" },
         { name: "謎の男", text: "「……高出力ユニットの負荷テスト……コンマ05の誤差で、これほどのズレが出るとはな。『エネルギー変換効率』を過信しすぎたか。」", chara: "kage" },
@@ -233,47 +252,47 @@
         { name: "父の声（回想）", text: "『いいか、ハルト。こいつは世界一のロボットだ。宇宙の果てでも、私とお前を繋いでくれる。……迷子になんて、絶対にならないさ』" },
         { name: "ハルト", text: "「（ノートをひっ掴む）……そうだ。お父さん、言ってたじゃないか。……『迷子にならない』って。……まさか！」", chara: "haruto" },
         { name: "ハルト", text: "「（端末を起動）……あった！ 高精度GPSユニット……！ お父さん、コドウのコアの奥に,こんなものまで組み込んでたのか！」", chara: "haruto" },
-        { name: "ハルト", text: "「（ノートをめくる）……落ち着け。絶対に、僕でも辿り着けるように『鍵』を隠してるはずだ。……これだ！」", chara: "haruto", note: { id: "n1", title: "父の開発ノート", body: "コドウ内蔵のGPS。ロック解除の鍵がノートの図形に隠されていた。" } },
+        { name: "ハルト", text: "「（ノートをめくる）……落ち着け。絶対に、僕でも辿着けるように『鍵』を隠してるはずだ。……これだ！」", chara: "haruto", note: { id: "n1", title: "父の開発ノート", body: "コドウ内蔵のGPS。ロック解除の鍵がノートの図形に隠されていた。" } },
         { name: "ハルト", text: "「……よし、通った！ コドウの信号をキャッチしたぞ。……『OSAKA中央駅』？ あいつ、駅へ向かってるのか！」", effect: "gps", loc: "Neo-Osaka-ST" },
-        { name: "システム", text: "（SE：駅の雑踏と、重厚なゲートが閉まる音）", bg: "bg_station" },
+        { name: "システム", text: "（SE：駅の雑踏と、重厚なゲートが閉まる音）", bg: "osaka01" },
         { name: "ハルト", text: "「ハァ、ハァ……！ やっと着いた。……って、ゲートが閉まった……！？ くそっ、あいつが強引に突破したせいで……！」", chara: "haruto" },
         { name: "駅アナウンス", text: "『警告。システムを警戒モードへ移行します。復旧には管理パスワードが必要です』" },
         { name: "ハルト", text: "「（信号を確認）方向は……北。……この先にあるのは、KYOTOか！」", chara: "haruto" },
         { name: "ハルト", text: "「……よし,やるしかない。父さんの残した『緊急解除コードのメモ』を解析するんだ！」", note: { id: "n2", title: "緊急解除コード", body: "リニア『ツルギ』を起動させるための父のメモ。" } },
-        { name: "ハルト", text: "「……よし、承認された！ システムリブート！ いけ……動けッ！！」", chara: "haruto" },
+        { name: "ハルト", text: "「……よし、承認された！ システムリブート！ いけ……動けッ！！」", chara: "haruto", bg: "osaka02" },
         { name: "システム", text: "（SE：駆動音と共に画面が激しくフラッシュ）", effect: "success" },
         { name: "駅アナウンス", text: "『管理コード承認。ゲートを開きます。機体「ツルギ」、緊急シークエンスを解除。目的地：KYOTO』" },
         { name: "ハルト", text: "「目的地は京都だ。……待ってろよ、コドウ。必ず、僕が助け出すから」", chara: "haruto", videoTrigger: true },
-        // 第2章：旧・京都研究所への道
-        { name: "ハルト", text: "「（京都駅に到着して）……ここが、KYOTO。……この霧、ただの霧じゃない。ナノマシンのノイズだ。GPSが位置を特定できない！」", bg: "bg_kyoto_station", chara: "haruto" },
-        { name: "ハルト", text: "「（ノートを照らし合わせる）分かったぞ、店の名前は『八百万ジャンク』だ！」", note: { id: "n3", title: "八百万ビット・ストリート", body: "京都の電脳街。" } },
-        { name: "ハルト", text: "「はぁ、はぁ……捕まえたぞ。……さあ、コドウを返せ！ 今すぐだ！」", bg: "bg_cyber_shop", chara: "haruto" },
+        // 第2章
+        { name: "ハルト", text: "「（京都駅に到着して）……ここが、KYOTO。……この霧、ただの霧じゃない。ナノマシンのノイズだ。GPSが位置を特定できない！」", bg: "kyotoeki01", chara: "haruto" },
+        { name: "ハルト", text: "「（ノートを照らし合わせる）分かったぞ、店の名前は『八百万ジャンク』だ！」", bg: "kyoto01", note: { id: "n3", title: "八百万ビット・ストリート", body: "京都の電脳街。" } },
+        { name: "ハルト", text: "「はぁ、はぁ……捕まえたぞ。……さあ、コドウを返せ！ 今すぐだ！」", bg: "yaorozu01", chara: "haruto" },
         { name: "謎の男", text: "「（ゆっくりと振り返り）……悪いな。だが,こいつはまだ返せない。」", chara: "kage" },
         { name: "ハルト", text: "「返せない！？ 勝手なことを言うな！ 僕の相棒だ,お前に触られる筋合いはない！」", chara: "haruto" },
         { name: "謎の男", text: "「……ふっ。いや,案外そうでも無いかもしれんぞ」", chara: "kage" },
         { name: "ハルト", text: "「は！？何言ってんだよ……？ お前,一体何者なんだ？」", chara: "haruto" },
         { name: "警備ドローン", text: "『……目標発見。ハルト……ハルト・アマツを確認』", effect: "error" },
         { name: "ハルト", text: "「っ！？ なんだこいつら……！？ なんで,なんで僕の名前を知ってるんだよ！」", chara: "haruto" },
-        { name: "ハルト", text: "「……そうか,お前の差し金か。こいつらを使って,僕を待ち伏せしてたのか！」", chara: "haruto" },
+        { name: "ハルト", text: "「……そうか,お前の差し金か。こいつらを使って、僕を待ち伏せしてたのか！」", chara: "haruto" },
         { name: "謎の男", text: "「……そいつらは警備用のドローン『ヤタガラス』だ。気をつけたほうがいいぜ」", chara: "kage" },
         { name: "謎の男", text: "「弾はゴム製だが,まともに食らえば骨の二,三本は覚悟しなきゃならない」", chara: "kage" },
         { name: "ハルト", text: "「……っ,脅しのつもりかよ！ 自分の仲間の性能を自慢しに来たのか！？」", chara: "haruto" },
         { name: "謎の男", text: "「……自慢じゃない。……事実を言ったまでだ」", chara: "kage" },
         { name: "謎の男", text: "「……すまないが,まだ返せない。……こいつは連れていく」", chara: "kage" },
         { name: "ハルト", text: "「待て！ 行かせるかよ！」", chara: "haruto" },
-        { name: "謎の男", text: "「……取り戻したければ,来い。……かつて,こいつが生まれた,あの場所に」", chara: "kage" },
+        { name: "謎の男", text: "「……取り戻したければ、来い。……かつて,こいつが生まれた、あの場所に」", chara: "kage" },
         { name: "ハルト", text: "「……っ！？ 『コドウが生まれた場所』……？ 、どういうことだ！？」", chara: "haruto" },
         { name: "謎の男", text: "「……詳しい場所は,そのノートを見れば思い出すはずだ。……そこで待っている」", chara: "kage" },
         { name: "システム", text: "（ヤタガラスと共に,謎の男が逃走していく）" },
-        { name: "ハルト", text: "「……あいつ,ドローンを操ってやがった。……それにしても……あいつ,一体何が目的なんだ……？」", chara: "haruto" },
-        { name: "システム", text: "（ハルトは,ノートの隠し地図が指し示す場所へと進む）" },
-        { name: "ハルト", text: "「（息を切らしながら）……ここだ。お父さんの旧・京都研究所。……間違いない、幼い頃に一度だけ連れてきてもらった、あの風景だ」", bg: "bg_old_lab", chara: "haruto" },
+        { name: "ハルト", text: "「……あいつ、ドローンを操ってやがった。……それにしても……あいつ、一体何が目的なんだ……？」", chara: "haruto" },
+        { name: "システム", text: "（ハルトは,ノートの隠し地図が指し示す場所へと進む）", bg: "kyotoeki01" },
+        { name: "ハルト", text: "「（息を切らしながら）……ここだ。お父さんの旧・京都研究所。……間違いない、幼い頃に一度だけ連れてきてもらった、あの風景だ」", chara: "haruto" },
         { name: "ハルト", text: "「……それにしても。……あいつ,どうして『ここ』を知っていたんだ？」", chara: "haruto" },
         { name: "ハルト", text: "「（立ち止まり、空を見上げる）……まさか。……あいつが,本当にお父さん……？ ……いや,そんなはずはない。でも,もしそうなら……どうしてあんな強引な真似を……」", chara: "haruto" },
-        { name: "ハルト", text: "「（周囲を見渡して）……誰もいない。……ハァ,ハァ……！ コドウ！ どこだ！ 返事をしてくれ！」", chara: "haruto" },
-        { name: "ハルト", text: "「（端末を見る）……くそっ,GPSの信号も完全に途切れてる。……あいつ,僕をからかったのか？」", chara: "haruto" },
+        { name: "ハルト", text: "「（周囲を見渡して）……誰もいない。……ハァ,ハァ……！ コドウ! どこだ！ 返事をしてくれ！」", chara: "haruto" },
+        { name: "ハルト", text: "「（端末を見る）……くそっ,GPSの信号も完全に途切れてる。……あいつ、僕をからかったのか？」", chara: "haruto" },
         { name: "ハルト", text: "「（力なく壁に背を預け、ずるずると座り込む）……全部、僕のせいだ。……ごめんな、コドウ」", chara: "haruto" },
-        { name: "ハルト", text: "「……お前がいてくれたから、お父さんがいなくても寂しくなかったんだ。……お前のあの、変な太鼓のリズム……。……もう一度、聞かせてくれよ……」", chara: "haruto" },
+        { name: "ハルト", text: "「……お前がいてくれたから、お父さんがいなくても寂しくなかったんだ。……お前のあの、変な太鼓のリズム……. ……もう一度、聞かせてくれよ……」", chara: "haruto" },
         { name: "システム", text: "（SE：聞き慣れた独特なリズムが響き始める）" },
         { name: "ハルト", text: "「（顔を上げる）……え？ ……この音、まさか……」", chara: "haruto" },
         { name: "コドウ", text: "「（和風な電子音で）ドン！ カカッ！ ……ハルト、遅いよ！ 待ちくたびれちゃった！」", chara: "kodou" },
@@ -281,22 +300,22 @@
         { name: "コドウ", text: "「全然平気！ なんだか体が、前よりずっと軽くなったみたいだよ！」", chara: "kodou" },
         { name: "ハルト", text: "「……よかった。……本当によかった……！」", chara: "haruto_kodou" },
         { name: "ハルト", text: "「……でも,あいつは……？ あの男はどこへ行ったんだ……？」", chara: "haruto" },
-        { name: "ハルト", text: "「……なあ,コドウ。あの男はどこへ行った？ あいつ,お前に何をしたんだ！？」", chara: "haruto" },
-        { name: "コドウ", text: "「……わかんないよ,ハルト。気がついたら,ここでハルトを待ってたんだ」", chara: "kodou" },
-        { name: "ハルト", text: "「……おかしい。僕の知っているコドウなら,こんなに黙り込んだりしないはずだ。……まさか,こいつ……本当に僕の知っている『コドウ』なのか？ 中身を……書き換えられたり、すり替えられたりしてないか……？」", chara: "haruto" },
+        { name: "ハルト", text: "「……なあ、コドウ。あの男はどこへ行った？ あいつ、お前に何をしたんだ！？」", chara: "haruto" },
+        { name: "コドウ", text: "「……わかんないよ,ハルト。気がついたら、ここでハルトを待ってたんだ」", chara: "kodou" },
+        { name: "ハルト", text: "「……おかしい。僕の知っているコドウなら,こんなに黙り込んだりしないはずだ。……まさか、こいつ……本当に僕の知っている『コドウ』なのか？ 中身を……書き換えられたり、すり替えられたりしてないか……？」", chara: "haruto" },
         { name: "システム", text: "（SE：ヤタガラスの鋭い飛行音）", effect: "error" },
-        { name: "ハルト", text: "「……っ！ しまった,さっきのドローンだ！ やっぱりあいつの仲間が追ってきてたのか！」", chara: "haruto" },
-        { name: "ハルト", text: "「……くそっ,考えるのは後だ。コドウ、行くぞ！ ここから出るんだ！」", chara: "haruto_kodou" },
+        { name: "ハルト", text: "「……っ！ しまった、さっきのドローンだ！ やっぱりあいつの仲間が追ってきてたのか！」", chara: "haruto" },
+        { name: "ハルト", text: "「……くそっ、考えるのは後だ。コドウ、行くぞ！ ここから出るんだ！」", chara: "haruto_kodou" },
         { name: "コドウ", text: "「（一瞬だけ奥の暗闇を振り返り、ハルトの後に続く）……うん,行こう！」", chara: "kodou" },
         // 第3章
-        { name: "ハルト", text: "「（走りながら）……はぁ,はぁ……！ どこまで追ってくるんだよ！」", bg: "bg_sky_garden", chara: "haruto_kodou" },
+        { name: "ハルト", text: "「（走りながら）……はぁ,はぁ……！ どこまで追ってくるんだよ！」", bg: "teien", chara: "haruto_kodou" },
         { name: "ハルト", text: "「……っ！？ 嘘だろ, あいつ……カゲじゃないか。なんでこんなところに……」", chara: "haruto" },
         { name: "ドローン", text: "『……警告。抵抗を止め、直ちにあの個体を渡せ。データを差し出せば、命までは取らん』" },
         { name: "謎の男", text: "「（膝をつき、端末を庇いながら）……断る。……コドウを,人殺しの道具には……させない……！」", chara: "kage" },
-        { name: "ハルト", text: "「……あいつ,攻撃されてる……？ ドローンの仲間じゃなかったのか」", chara: "haruto" },
-        { name: "コドウ", text: "「ドン……。ハルト、お願い,助けてあげて。……この人,悪い人じゃないよ」", chara: "kodou" },
+        { name: "ハルト", text: "「……あいつ、攻撃されてる……？ ドローンの仲間じゃなかったのか」", chara: "haruto" },
+        { name: "コドウ", text: "「ドン……。ハルト、お願い,助けてあげて。……この人、悪い人じゃないよ」", chara: "kodou" },
         { name: "ハルト", text: "「コドウ……？」", chara: "haruto" },
-        { name: "コドウ", text: "「さっきの研究所でね、僕の壊れかけてた回路を、この人が一生懸命直してくれたんだ。お父さんみたいに、ずっと、ずっと優しく……」", chara: "kodou" },
+        { name: "コドウ", text: "「さっきの研究所でね、僕の壊れかけてた回路を,この人が一生懸命直してくれたんだ。お父さんみたいに、ずっと、ずっと優しく……」", chara: "kodou" },
         { name: "ハルト", text: "「（決意を固め、叫ぶ）そこまでだ！ ……コドウ,いけっ！！」", chara: "haruto_kodou" },
         { name: "謎の男", text: "「……ハルト！？ なぜここに……！ 来るなと言ったはずだ……！」", chara: "kage" },
         { name: "ハルト", text: "「たまたま通りかかっただけだよ！ ……借りは返す。コドウがそう言うなら,信じてやる！」", chara: "haruto" },
@@ -306,7 +325,7 @@
         { name: "システム", text: "（SE：システム承認音。一瞬、ドローンたちの動きが止まる）" },
         { name: "ハルト", text: "「……止まった！ やったぞ,墜落しろッ！！」", chara: "haruto" },
         { name: "システム音声", text: "『警告。不正なアクセスを検知。防衛プロトコルが暴走モードへ移行します。自爆シークエンス開始』", effect: "error" },
-        { name: "ハルト", text: "「なっ……！？ 嘘だろ, 墜落どころか自爆……！？」", chara: "haruto" },
+        { name: "ハルト", text: "「なっ……！？ 嘘だろ、墜落どころか自爆……！？」", chara: "haruto" },
         { name: "謎の男", text: "「……バカな,モード：アルファが拒絶された……！？」", chara: "kage" },
         { name: "ハルト", text: "「計算違いかよ！ お父さん気取りで偉そうに指示しといて、大外れじゃねーか！ 解除キー、解除キーはどこだ……！？」", chara: "haruto" },
         { name: "システム", text: "（SE：制限時間ギリギリでハルトがキーを入力。ドローンが沈黙する）", effect: "success" },
@@ -315,23 +334,23 @@
         { name: "ハルト", text: "「『助かったよ』じゃないだろ！ お前,お父さんのプロトコルが通用するかどうかも分かってなかったのか？」", chara: "haruto" },
         { name: "謎の男", text: "「……いや、完全に俺のミスだ。博士の設計を,この時代の奴らがここまで歪めて運用してるとは思わなかった」", chara: "kage" },
         { name: "ハルト", text: "「詰めが甘いんだよ。しっかりしなよ,エンジニア失格だぞ」", chara: "haruto" },
-        { name: "謎の男", text: "「……そうだな。……全く,その通りだ。……手厳しいな,お前は」", chara: "kage" },
-        { name: "ハルト", text: "「本当のことだろ。……次はもっと,ちゃんとやってくれよ」", chara: "haruto" },
-        { name: "謎の男", text: "「……ああ,約束する。だからハルト,お前も今のその言葉,しっかりと覚えておいてくれ。……『詰めを甘くするな』。……」", chara: "kage" },
+        { name: "謎の男", text: "「……そうだな。……全く、その通りだ。……手厳しいな、お前は」", chara: "kage" },
+        { name: "ハルト", text: "「本当のことだろ。……次はもっと、ちゃんとやってくれよ」", chara: "haruto" },
+        { name: "謎の男", text: "「……ああ、約束する。だからハルト,お前も今のその言葉、しっかりと覚えておいてくれ。……『詰めを甘くするな』。……」", chara: "kage" },
         // エピローグ
-        { name: "システム", text: "（SE：遠ざかるリニアの駆動音。空中庭園には、壊れたドローンの残骸と、夜明け前の冷たい風の音だけが残っている）", bg: "bg_dawn" },
-        { name: "ハルト（未来）", text: "「（去りゆくハルトたちの背中を見送り、ふっと力を抜く）……ふぅ。……全く、相変わらず口の減らないガキだ」", chara: "kage" },
+        { name: "システム", text: "（SE：遠ざかるリニアの駆動音。空中庭園には、壊れたドローンの残骸と、夜明け前の冷たい風の音だけが残っている）", bg: "teien" },
+        { name: "ハルト（未来）", text: "「（去りゆくハルトたちの背中を見送り,ふっと力を抜く）……ふぅ。……全く,相変わらず口の減らないガキだ」", chara: "kage" },
         { name: "システム", text: "（カゲ、ヘルメットを外す。現れたのは、数年後のハルト……少し大人びた青年の姿だった）", chara: "kage" },
         { name: "ハルト（未来）", text: "「（自分の透け始めた手を見つめて、静かに笑う）……よし、計算通りだな。……歴史が書き換わり始めたようだ。」", chara: "kage" },
         { name: "ハルト（未来）", text: "「（壊れたドローンの残骸を見下ろし）この型番！？、……そういうとか。……僕のいた未来のドローンじゃない。もっと先の未来。」", chara: "kage" },
-        { name: "ハルト（未来）", text: "「……歴史の修正を阻もうと追ってきたということか。……でも,それももう終わりだ。」", chara: "kage" },
+        { name: "ハルト（未来）", text: "「……歴史の修正を阻もうと追ってきたということか。……反映が、それももう終わりだ。」", chara: "kage" },
         { name: "システム", text: "（ハルトと同じように消えかかるドローン）" },
         { name: "ハルト（未来）", text: "「これで燃料切れで置いたきたバイク型のタイムマシンも消えてくれるだろう」", chara: "kage" },
-        { name: "ハルト（未来）", text: "「……お前がエラーを出したあの瞬間に、毒を取り除く。……それ以外に、あの地獄のような未来を消し去る方法はなかった。」", chara: "kage" },
+        { name: "ハルト（未来）", text: "「……お前がエラーを出したあの瞬間に,毒を取り除く。……それ以外に、あの地獄のような未来を消し去る方法はなかった。」", chara: "kage" },
         { name: "ハルト（未来）", text: "「お前のメンテナンスによって偶発的ではあるがコドウのプログラムが劇的に進化をしてしまうのだ。……そしてそれは軍事技術に転用され、……多くの命が犠牲になるんだ。」", chara: "kage" },
         { name: "ハルト（未来）", text: "「それもこれでおしまいだ。もうあの未来にはつながらない」", chara: "kage" },
         { name: "システム", text: "（ハルト（未来）の体が、朝日に溶けるように、激しく光の粒子となって散り始める）", effect: "success" },
-        { name: "ハルト（未来）", text: "「（微笑んで）……『エンジニア失格』か。……ああ、その通りだよ。……お前がこれから創る、新しい未来に……。……『エンジニア失格』である僕は、もう必要ないんだ。」", chara: "kage" },
+        { name: "ハルト（未来）", text: "「（微笑んで）……『エンジニア失格』か。……ああ、その通りだよ。……お前がこれから創る、新しい未来に。」", chara: "kage" },
         { name: "ハルト（未来）", text: "「未来を頼んだぞ……」", chara: "kage" },
         { name: "システム", text: "―― THE END ――" }
     ];
