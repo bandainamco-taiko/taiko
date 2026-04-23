@@ -31,7 +31,7 @@
             width: 90vw; max-width: 400px; height: 85vh; max-height: 800px;
             background: rgba(10, 25, 40, 0.95); border: 2px solid rgba(0, 242, 254, 0.3);
             border-radius: 40px; padding: 20px; display: flex; flex-direction: column;
-            box-shadow: 0 0 50px rgba(0, 242, 254, 0.2); position: relative;
+            box-shadow: 0 0 50px rgba(0, 242, 255, 0.2); position: relative;
         }
 
         .status-header {
@@ -125,7 +125,6 @@
     let gameState = 'START'; // START, PLAYING, GAMEOVER, CLEAR
     let loopId = null;
 
-    // 難易度設定 (SPEED UP + ZONE DOWN)
     const levels = {
         1: { s: 1.5, w: 30 },
         2: { s: 2.5, w: 22 },
@@ -134,7 +133,6 @@
         5: { s: 8.5, w: 6 }
     };
 
-    // 音声エンジン
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     function playSound(type) {
         if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -176,17 +174,17 @@
     }
 
     function handleTrigger() {
-        if (gameState === 'START' || gameState === 'GAMEOVER' || gameState === 'CLEAR') {
+        if (gameState === 'START' || gameState === 'GAMEOVER') {
             resetGame();
             return;
         }
+        if (gameState === 'CLEAR') return; // クリア後は何もしない
 
         if (!active) return;
         playSound('hit');
 
         const w = levels[stg].w;
         if (pos >= 50 - w/2 && pos <= 50 + w/2) {
-            // 成功
             active = false;
             cancelAnimationFrame(loopId);
             if (stg < 5) {
@@ -200,13 +198,19 @@
                     run();
                 }, 500);
             } else {
+                // --- クリア判定：ここから game02.html への遷移を追加 ---
+                playSound('success');
                 gameState = 'CLEAR';
                 msgDisp.innerText = "GATE OPENED";
                 msgDisp.className = "success";
-                btn.innerText = "REBOOT";
+                btn.innerText = "LOADING...";
+                
+                // 1.5秒後に game02.html へ自動遷移
+                setTimeout(() => {
+                    window.location.href = "game02.html";
+                }, 1500);
             }
         } else {
-            // 失敗
             playSound('fail');
             lives--;
             update();
@@ -241,7 +245,6 @@
         run();
     }
 
-    // イベントリスナーの修正
     btn.addEventListener('touchstart', (e) => { e.preventDefault(); handleTrigger(); }, {passive: false});
     btn.addEventListener('mousedown', (e) => { 
         if (!('ontouchstart' in window)) handleTrigger(); 

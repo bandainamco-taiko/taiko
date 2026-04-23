@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-select=none">
+    <title>NEURAL OVERLINK 2050</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-0: #ff0055; /* 赤 */
+            --color-1: #00f2fe; /* 青 */
+            --color-2: #00ff9d; /* 緑 */
+            --color-3: #f9d423; /* 黄 */
+            --bg-dark: #00050a;
+        }
+
+        * { box-sizing: border-box; touch-action: none; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            margin: 0; padding: 0; background-color: var(--bg-dark);
+            color: #fff; font-family: 'Orbitron', sans-serif;
+            height: 100vh; overflow: hidden; display: flex; justify-content: center; align-items: center;
+        }
+
+        #game-container {
+            position: relative; width: 100vw; max-width: 450px; height: 100vh;
+            border-left: 1px solid rgba(0, 242, 254, 0.2); border-right: 1px solid rgba(0, 242, 254, 0.2);
+            overflow: hidden; background: radial-gradient(circle at center, #001a2a 0%, #00050a 100%);
+        }
+
+        canvas { display: block; }
+
+        .ui {
+            position: absolute; top: 20px; left: 0; width: 100%; padding: 0 20px;
+            display: flex; justify-content: space-between; z-index: 10; font-size: 12px;
+            pointer-events: none; text-shadow: 0 0 10px rgba(0, 242, 254, 0.5);
+        }
+
+        .overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85); display: flex; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 20; text-align: center;
+        }
+
+        h1 { font-size: 24px; color: var(--color-1); letter-spacing: 4px; margin-bottom: 20px; }
+        .btn {
+            padding: 15px 40px; background: transparent; border: 2px solid var(--color-1);
+            color: var(--color-1); font-family: 'Orbitron', sans-serif; cursor: pointer;
+            transition: 0.2s; text-transform: uppercase;
+        }
+        .btn:active { background: var(--color-1); color: #000; }
+
+        #phase-msg {
+            position: absolute; top: 20%; width: 100%; text-align: center;
+            font-size: 20px; color: #fff; text-shadow: 0 0 20px #fff;
+            pointer-events: none; opacity: 0; transition: opacity 0.5s;
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <div class="ui">
+        <div>LAYER: <span id="layer-val">1</span>/5</div>
+        <div id="integrity">LINK: 100%</div>
+    </div>
+
+    <div id="phase-msg">MEMORIZE</div>
+
+    <div id="start-screen" class="overlay">
+        <h1>NEURAL OVERLINK</h1>
+        <p style="font-size: 10px; margin-bottom: 20px; color: rgba(255,255,255,0.6);">REMEMBER THE SEQUENCE. SYNC THE NODES.</p>
+        <button class="btn" id="start-btn">LINK START</button>
+    </div>
+
+    <div id="result-screen" class="overlay hidden" style="display:none;">
+        <h1 id="result-title">LINK LOST</h1>
+        <p id="result-desc" style="margin-bottom: 20px;"></p>
+        <button class="btn" id="retry-btn">RE-INITIALIZE</button>
+    </div>
+
+    <canvas id="canvas"></canvas>
+</div>
+
+<script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const container = document.getElementById('game-container');
+    const layerDisp = document.getElementById('layer-val');
+    const integrityDisp = document.getElementById('integrity');
+    const phaseMsg = document.getElementById('phase-msg');
+
+    let layer = 1;
+    let integrity = 100;
+    let gameState = 'IDLE'; // IDLE, MEMORIZE, SYNC, GAMEOVER
+    let sequence = [];
+    let playerIndex = 0;
+    let nodes = [];
+    let frame = 0;
+    let corePulse = 0;
+
+    const COLORS = ['#ff0055', '#00f2fe', '#00ff9d', '#f9d423'];
+    const AUDIO_FREQS = [261.63, 329.63, 392.00, 523.25]; // C, E, G, C(high)
+
+    // オーディオ初期化
+    let audioCtx = null;
+    function initAudio() {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    function beep(freq, duration = 0.2, type = 'sine') {
+        if (!audioCtx) return;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+    }
+
+    function initCanvas() {
+        canvas.width = container.clientWidth;
+        canvas.height = container.clientHeight;
+    }
+
+    class Node {
+        constructor(colorIdx) {
+            this.colorIdx = colorIdx;
+            this.color = COLORS[colorIdx];
+            this.r = 18;
+            this.x = Math.random() * (canvas.width - this.r * 2) + this.r;
+            this.y = -50;
+            this.speed = 2.5 + (layer * 0.8);
+            this.isFake = Math.random() < 0.2; // 20%でフェイク（灰色の邪魔者）
+            if(this.isFake) this.color = '#555';
+        }
+        update() { this.y += this.speed; }
+        draw() {
+            ctx.shadowBlur = 15; ctx.shadowColor = this.color;
+            ctx.fillStyle = this.color;
+            ctx.beginPath(); ctx.arc(this.x, this.y, this.r, 0, Math.PI*2); ctx.fill();
+            ctx.shadowBlur = 0;
+            // ガラスの反射エフェクト
+            ctx.fillStyle = 'rgba(255,255,255,0.3)';
+            ctx.beginPath(); ctx.arc(this.x - 5, this.y - 5, 4, 0, Math.PI*2); ctx.fill();
+        }
+    }
+
+    async function startMemorize() {
+        gameState = 'MEMORIZE';
+        phaseMsg.innerText = "MEMORIZE SEQUENCE";
+        phaseMsg.style.opacity = 1;
+        
+        sequence = [];
+        const length = 2 + layer; // 階層ごとに長さ増加
+        for(let i=0; i<length; i++) sequence.push(Math.floor(Math.random() * 4));
+
+        await new Promise(r => setTimeout(r, 1000));
+        
+        for(let idx of sequence) {
+            corePulse = 40;
+            coreColor = COLORS[idx];
+            beep(AUDIO_FREQS[idx], 0.3, 'triangle');
+            await new Promise(r => setTimeout(r, 600));
+            corePulse = 0;
+            await new Promise(r => setTimeout(r, 200));
+        }
+
+        startSync();
+    }
+
+    function startSync() {
+        gameState = 'SYNC';
+        playerIndex = 0;
+        nodes = [];
+        phaseMsg.innerText = "SYNC START";
+        setTimeout(() => phaseMsg.style.opacity = 0, 1000);
+    }
+
+    function update() {
+        if (gameState === 'SYNC') {
+            frame++;
+            // 難易度に応じた出現頻度
+            if (frame % Math.max(20, 50 - layer * 5) === 0) {
+                // 正解の色、またはランダムな色を流す
+                const nextColor = (Math.random() > 0.4) ? sequence[playerIndex] : Math.floor(Math.random()*4);
+                nodes.push(new Node(nextColor));
+            }
+
+            nodes.forEach((n, i) => {
+                n.update();
+                // 画面外に逃した判定
+                if (n.y > canvas.height + 50) {
+                    if (!n.isFake && n.colorIdx === sequence[playerIndex]) {
+                        takeDamage("MISSED NODE");
+                    }
+                    nodes.splice(i, 1);
+                }
+            });
+        }
+    }
+
+    function takeDamage(reason) {
+        integrity -= 15;
+        beep(100, 0.2, 'sawtooth');
+        if (integrity <= 0) gameOver(false);
+        integrityDisp.innerText = `LINK: ${integrity}%`;
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // 背景グリッド
+        ctx.strokeStyle = 'rgba(0, 242, 254, 0.05)';
+        for(let i=0; i<canvas.width; i+=40) {
+            ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, canvas.height); ctx.stroke();
+        }
+
+        // コア描画
+        const cx = canvas.width / 2;
+        const cy = canvas.height / 2;
+        ctx.shadowBlur = 20 + corePulse;
+        ctx.shadowColor = (gameState === 'MEMORIZE' && corePulse > 0) ? coreColor : COLORS[1];
+        ctx.strokeStyle = ctx.shadowColor;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(cx, cy, 50 + Math.sin(Date.now()/500)*5, 0, Math.PI*2);
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+
+        // ノード描画
+        nodes.forEach(n => n.draw());
+    }
+
+    function handleInput(x, y) {
+        if (gameState !== 'SYNC') return;
+
+        let hit = false;
+        nodes.forEach((n, i) => {
+            const dist = Math.hypot(n.x - x, n.y - y);
+            if (dist < n.r + 20) {
+                hit = true;
+                if (!n.isFake && n.colorIdx === sequence[playerIndex]) {
+                    // 正解
+                    beep(AUDIO_FREQS[n.colorIdx], 0.1);
+                    nodes.splice(i, 1);
+                    playerIndex++;
+                    if (playerIndex >= sequence.length) {
+                        nextLayer();
+                    }
+                } else {
+                    // 不正解
+                    takeDamage("SEQUENCE ERROR");
+                    nodes.splice(i, 1);
+                }
+            }
+        });
+    }
+
+    function nextLayer() {
+        if (layer >= 5) {
+            gameOver(true);
+        } else {
+            layer++;
+            layerDisp.innerText = layer;
+            gameState = 'IDLE';
+            startMemorize();
+        }
+    }
+
+    function gameOver(isClear) {
+        gameState = 'GAMEOVER';
+        const screen = document.getElementById('result-screen');
+        const title = document.getElementById('result-title');
+        const desc = document.getElementById('result-desc');
+        
+        screen.style.display = 'flex';
+        if(isClear) {
+            title.innerText = "OVERLINK COMPLETE";
+            title.style.color = COLORS[2];
+            desc.innerText = "ALL SERVERS BREACHED.";
+        } else {
+            title.innerText = "LINK LOST";
+            title.style.color = COLORS[0];
+            desc.innerText = `FAILED AT LAYER ${layer}.`;
+        }
+    }
+
+    function loop() {
+        update(); draw();
+        requestAnimationFrame(loop);
+    }
+
+    // Input
+    container.addEventListener('mousedown', e => {
+        const rect = canvas.getBoundingClientRect();
+        handleInput(e.clientX - rect.left, e.clientY - rect.top);
+    });
+    container.addEventListener('touchstart', e => {
+        const rect = canvas.getBoundingClientRect();
+        handleInput(e.touches[0].clientX - rect.left, e.touches[0].clientY - rect.top);
+        e.preventDefault();
+    }, {passive: false});
+
+    document.getElementById('start-btn').onclick = () => {
+        initAudio();
+        document.getElementById('start-screen').style.display = 'none';
+        startMemorize();
+    };
+
+    document.getElementById('retry-btn').onclick = () => location.reload();
+
+    initCanvas();
+    loop();
+</script>
+</body>
+</html>

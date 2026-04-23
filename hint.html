@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HINT - 与田博士の相談室</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Noto+Sans+JP:wght@300;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --cyber-blue: #00f2ff;
+            --cyber-pink: #ff00ff;
+            --wa-indigo: #0d1b2a;
+            --bg-black: #00050a;
+        }
+
+        body {
+            margin: 0;
+            background-color: var(--bg-black);
+            color: #fff;
+            font-family: 'Noto Sans JP', sans-serif;
+            line-height: 1.6;
+        }
+
+        #container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            border-left: 1px solid rgba(0, 242, 255, 0.2);
+            border-right: 1px solid rgba(0, 242, 255, 0.2);
+        }
+
+        /* 博士エリア */
+        #doctor-area {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            border: 2px solid var(--cyber-blue);
+            background: rgba(0, 242, 255, 0.05);
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.1);
+        }
+
+        .doctor-img {
+            width: 120px;
+            height: auto;
+            filter: drop-shadow(0 0 10px var(--cyber-blue));
+            margin-bottom: 15px;
+        }
+
+        .doctor-msg {
+            font-size: 0.9rem;
+            color: var(--cyber-blue);
+            font-weight: bold;
+        }
+
+        /* セクション見出し */
+        h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            border-left: 4px solid var(--cyber-pink);
+            padding-left: 10px;
+            margin: 30px 0 15px;
+            color: var(--cyber-pink);
+            letter-spacing: 0.1em;
+        }
+
+        /* ヒント項目 */
+        .hint-item {
+            margin-bottom: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 242, 255, 0.2);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .hint-label {
+            padding: 12px 15px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--wa-indigo);
+            font-size: 0.9rem;
+            transition: 0.3s;
+        }
+
+        .hint-label:hover {
+            background: rgba(0, 242, 255, 0.1);
+        }
+
+        .hint-label::after {
+            content: '▼';
+            font-size: 0.7rem;
+            color: var(--cyber-blue);
+        }
+
+        .hint-content {
+            padding: 15px;
+            display: none;
+            font-size: 0.85rem;
+            color: #ccc;
+            border-top: 1px solid rgba(0, 242, 255, 0.1);
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        /* 表示・非表示切り替え用 */
+        .hint-item.active .hint-content {
+            display: block;
+        }
+        .hint-item.active .hint-label::after {
+            content: '▲';
+        }
+
+        .btn-close {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin-top: 50px;
+            background: transparent;
+            border: 1px solid var(--cyber-blue);
+            color: var(--cyber-blue);
+            text-align: center;
+            text-decoration: none;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: bold;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-close:hover {
+            background: var(--cyber-blue);
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+
+<div id="container">
+    <div id="doctor-area">
+        <img src="img/yoda.png" alt="与田博士" class="doctor-img">
+        <div class="doctor-msg">「行き詰ったら私に相談してね」</div>
+    </div>
+
+    <h2>RECORD 1: GPS PROTOCOL</h2>
+    <div class="hint-item">
+        <div class="hint-label" onclick="toggleHint(this)">HINT 1</div>
+        <div class="hint-content">26文字といえばアルファベッドだね。0からは数字を埋めよう。答えはすべてアルファベッドだよ。</div>
+    </div>
+    <div class="hint-item">
+        <div class="hint-label" onclick="toggleHint(this)">HINT 2</div>
+        <div class="hint-content">下の画像には共通して同じ文字が入るよ。その文字を引いたらどうなるかな。</div>
+    </div>
+
+    <h2>TAIKO NO NAZO DA DON</h2>
+    <div class="hint-item">
+        <div class="hint-label" onclick="toggleHint(this)">其の壱</div>
+        <div class="hint-content">例をよく見てみよう。「た」はドンが4、カッが1だね。五十音に当てはめてみよう。</div>
+    </div>
+    <div class="hint-item">
+        <div class="hint-label" onclick="toggleHint(this)">其の弐</div>
+        <div class="hint-content">まずは、空いている文字を埋めよう。文字の順番を表す数字はないかな。</div>
+    </div>
+    <div class="hint-item">
+        <div class="hint-label" onclick="toggleHint(this)">其の参</div>
+        <div class="hint-content">太鼓の歴史を学んでみよう。</div>
+    </div>
+    <div class="hint-item">
+        <div class="hint-label" onclick="toggleHint(this)">其の肆</div>
+        <div class="hint-content">よみがなを空いているマスに埋めていこう。</div>
+    </div>
+
+    <h2>RECORD 2: ROUTE TO FACILITY</h2>
+    <div class="hint-item">
+        <div class="hint-label" onclick="toggleHint(this)">HINT 1</div>
+        <div class="hint-content">はさみと勝ち負けといえばなんだろう。</div>
+    </div>
+    <div class="hint-item">
+        <div class="hint-label" onclick="toggleHint(this)">HINT 2</div>
+        <div class="hint-content">方角を示しているようだね。</div>
+    </div>
+    <div class="hint-item">
+        <div class="hint-label" onclick="toggleHint(this)">HINT 3</div>
+        <div class="hint-content">みんな使うものだよ、最近はスマホのせいで使う機会も減ったかもしれないね。</div>
+    </div>
+
+    <h2>RECORD 3: DRONE SECURITY</h2>
+    <div class="hint-item">
+        <div class="hint-label" onclick="toggleHint(this)">HINT 1</div>
+        <div class="hint-content">7つの繰り返しといえばなんだろう。一つは色のイメージがあるよ。二つの中で共通する文字があるよ。</div>
+    </div>
+    <div class="hint-item">
+        <div class="hint-label" onclick="toggleHint(this)">HINT 2</div>
+        <div class="hint-content">まずはスキマを塗りつぶそう。、ジカンをつぶすという事は文字が落ちてくるよ。</div>
+    </div>
+    <div class="hint-item">
+        <div class="hint-label" onclick="toggleHint(this)">HINT 3</div>
+        <div class="hint-content">イラストに共通する文字はなんだろうか。それらが表す部分の文字を抜き出そう。ひとつだけひっかけがあるみたいだね。</div>
+    </div>
+    <div class="hint-item">
+        <div class="hint-label" onclick="toggleHint(this)">HINT 4</div>
+        <div class="hint-content">キドウではないよ。よーく見てみよう、必要なピースを探して埋めよう。</div>
+    </div>
+
+    <button class="btn-close" onclick="window.close()">CLOSE WINDOW</button>
+</div>
+
+<script>
+    function toggleHint(element) {
+        const item = element.parentElement;
+        item.classList.toggle('active');
+    }
+</script>
+
+</body>
+</html>

@@ -121,7 +121,7 @@
 </div>
 
 <script>
-    // --- オーディオエンジン (Web Audio API) ---
+    // --- オーディオエンジン ---
     let audioCtx = null;
     let mainGain = null;
 
@@ -130,7 +130,7 @@
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         mainGain = audioCtx.createGain();
         mainGain.connect(audioCtx.destination);
-        mainGain.gain.value = 0.15; // 全体の音量
+        mainGain.gain.value = 0.15;
     }
 
     function playNote(freq, type, duration, volume = 1) {
@@ -156,7 +156,7 @@
 
     let active = false;
     let distance = 0;
-    const GOAL = 300;
+    const GOAL = 30;
     let speed = 4.5;
     let player = { x: 0, y: 0, size: 15, tx: 0, ty: 0 };
     let obstacles = [];
@@ -196,18 +196,13 @@
         distDisp.innerText = Math.floor(distance);
         progressGrid.style.width = (distance / GOAL * 100) + '%';
 
-        // --- BGMエンジン ---
-        // 16フレームごとにベース音を鳴らす（速度に合わせて間隔を狭める）
+        // 動的BGM生成
         let tempo = Math.max(8, 20 - Math.floor(distance / 20));
         if (frame % tempo === 0) {
             const beat = (frame / tempo) % 4;
-            const notes = [55, 55, 65, 41]; // 低音ベースライン (A1, A1, C2, E1的な)
+            const notes = [55, 55, 65, 41];
             playNote(notes[beat], 'square', 0.4, 0.5);
-            
-            // スネア的なノイズ音 (2拍目と4拍目)
-            if (beat === 1 || beat === 3) {
-                playNote(100, 'sawtooth', 0.1, 0.2);
-            }
+            if (beat === 1 || beat === 3) playNote(100, 'sawtooth', 0.1, 0.2);
         }
 
         if (distance >= GOAL) { gameClear(); return; }
@@ -231,10 +226,8 @@
     function draw() {
         ctx.fillStyle = '#000205';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
         obstacles.forEach(o => o.draw());
 
-        // プレイヤー (Δ)
         ctx.save();
         ctx.translate(player.x, player.y);
         ctx.fillStyle = '#fff';
@@ -257,13 +250,13 @@
 
     function gameOver() {
         active = false;
-        playNote(150, 'sawtooth', 0.5, 1); // 失敗音
+        playNote(150, 'sawtooth', 0.5, 1);
         document.getElementById('dead-screen').classList.remove('hidden');
     }
 
     function gameClear() {
         active = false;
-        playNote(440, 'sine', 0.2, 1); // 成功音
+        playNote(440, 'sine', 0.2, 1);
         setTimeout(()=>playNote(880, 'sine', 0.5, 1), 100);
         document.getElementById('clear-screen').classList.remove('hidden');
     }
@@ -281,7 +274,11 @@
 
     document.getElementById('start-btn').onclick = () => { initAudio(); reset(); };
     document.getElementById('retry-btn').onclick = reset;
-    document.getElementById('finish-btn').onclick = () => location.reload();
+
+    // ★ 修正：TERMINATEボタンでクリアフラグを持ってindex.htmlに戻る
+    document.getElementById('finish-btn').onclick = () => {
+        window.location.href = "index.html?mode=after_game";
+    };
 
     function reset() {
         distance = 0; speed = 4.5; obstacles = []; frame = 0;
