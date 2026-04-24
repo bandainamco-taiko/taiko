@@ -2,45 +2,67 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>ワンナイト・リクレイマー</title>
     <style>
-        body { margin:0; background:#000; display:flex; justify-content:center; align-items:center; height:100dvh; overflow:hidden; color:#00f2ff; font-family:sans-serif; }
-        video { width:100%; height:100%; object-fit:cover; display:none; }
-        #start-btn { padding:20px 40px; border:2px solid #00f2ff; cursor:pointer; font-weight:bold; background:rgba(0,242,255,0.1); }
+        :root { --cyber-blue: #00f2ff; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100dvh; background: #000; overflow: hidden; display: flex; justify-content: center; align-items: center; color: #fff; font-family: "Sawarabi Mincho", serif; }
+        
+        #stage { position: relative; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; background: #000; }
+        video { width: 100%; height: 100%; object-fit: cover; display: none; }
+
+        /* スタートボタンのデザイン：本編に合わせる */
+        #start-btn {
+            position: relative; padding: 15px 40px;
+            background: transparent; color: var(--cyber-blue);
+            border: 2px solid var(--cyber-blue);
+            cursor: pointer; font-weight: bold; font-family: sans-serif;
+            letter-spacing: 0.2em;
+            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.3);
+            text-align: center;
+            z-index: 100;
+        }
+        #start-btn:active { background: rgba(0, 242, 255, 0.2); }
+
+        /* 装飾用のテキスト */
+        #decoration-text { position: absolute; bottom: 20px; font-size: 0.7rem; color: rgba(0, 242, 255, 0.5); font-family: sans-serif; letter-spacing: 0.1em; }
     </style>
 </head>
 <body>
+    <div id="stage">
+        <div id="start-btn" onclick="playVideo()">START SYSTEM</div>
+        <div id="decoration-text">RECLAIMER_UNIT_BOOT_SEQUENCE...</div>
 
-    <div id="start-btn" onclick="playVideo()">START SYSTEM</div>
-
-    <video id="myVideo" playsinline webkit-playsinline>
-        <source src="img/opening.mp4" type="video/mp4">
-        お使いのブラウザは動画再生に対応していません。
-    </video>
+        <video id="v" src="img/opening.mp4" playsinline webkit-playsinline></video>
+    </div>
 
     <script>
-        const v = document.getElementById('myVideo');
+        const v = document.getElementById('v');
         const b = document.getElementById('start-btn');
+        const d = document.getElementById('decoration-text');
 
         function playVideo() {
-            // ボタンを消して動画を出す
+            // ボタンと装飾を消して動画を出す
             b.style.display = 'none';
+            d.style.display = 'none';
             v.style.display = 'block';
 
-            // 再生命令
+            // スマホでの音付き再生を実行
             v.play().catch(e => {
-                console.error(e);
-                alert("再生エラーが発生しました。\nファイル：img/opening.mp4 が存在するか確認してください。");
+                console.error("Playback Error:", e);
+                alert("再生エラー: 動画データが見つかりません。\nimg/opening.mp4 のパスを確認してください。");
             });
         }
 
-        // 終わったら次へ
-        v.onended = () => { location.href = 'index.html?mode=after_video'; };
+        // 動画が終了した時の処理：本編へ
+        v.onended = () => { 
+            location.href = 'index.html?mode=after_video'; 
+        };
 
-        // 読み込みエラーが起きたらすぐ報告
+        // 致命的なエラーが起きた場合
         v.onerror = () => {
-            alert("サーバー上の動画ファイルを読み込めません。\nパス間違いか、サーバーの設定（MIMEタイプ）が原因です。");
+            alert("動画の読み込みに失敗しました。\nファイル形式が H.264 であることを確認してください。");
         };
     </script>
 </body>
