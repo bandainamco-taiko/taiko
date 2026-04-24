@@ -259,11 +259,11 @@
         const urlParams = new URLSearchParams(window.location.search);
         const mode = urlParams.get('mode');
         
-        if (mode === 'after_video' || mode === 'after_game' || currentStep > 0) {
+        if (mode === 'after_video' || mode === 'after_game' || (currentStep > 0 && currentStep < scenario.length)) {
             document.getElementById('title-screen').remove();
             document.getElementById('msg-window').style.display = 'block';
-            if (mode === 'after_video') currentStep = 25; 
-            if (mode === 'after_game') currentStep = 22;
+            if (mode === 'after_video') currentStep = 26; 
+            if (mode === 'after_game') currentStep = 23;
             saveGame();
             showText();
         }
@@ -282,16 +282,16 @@
         { name: "謎の男", text: "「……静かにしてくれ。……急がなければ。」", chara: "kage" },
         { name: "システム", text: "謎の男がコドウを抱え、窓から夜の街へ消えていった" },
         { name: "ハルト", text: "「……そんな、 嘘だろ。……コドウ……。 僕の大事な、たった一人の相棒なのに……」", chara: "haruto" },
-        { name: "（回想）父の声", text: "『いいか、ハルト。こいつは世界一のロボットだ。宇宙の果てでも、私とお前を繋いでくれる。……迷子になんて、絶対にならないさ』" },
+        { name: "父の声", text: "『いいか、ハルト。こいつは世界一のロボットだ。宇宙の果てでも、私とお前を繋いでくれる。……迷子になんて、絶対にならないさ』" },
         { name: "ハルト", text: "「……そうだ。お父さん、言ってたじゃないか。……『迷子にならない』って。」", chara: "haruto" },
         { name: "ハルト", text: "「よし、コドウの管理用端末にログインして、……あった！ 高精度GPSユニット！……よしこれで……？！ダメだ、パスワードでロックされている。」", chara: "haruto" },
         { name: "ハルト", text: "「……落ち着け。絶対に、 僕でも辿り着けるように『鍵』を隠してるはずだ。……たしかお父さんの研究ノートに……」", chara: "haruto", note: { id: "n1", title: "父の開発ノート", body: "コドウ内蔵のGPS。ロック解除の鍵がノートの図形に隠されていた。" } },
         { name: "システム", text: "研究ノートを開きパスワードを解明しましょう。", input: { guide: "パスワードを入力してください", ans: "trace" } },
         { name: "ハルト", text: "「……よし、やったぞ！ コドウの信号をキャッチしたぞ。……『OSAKA駅』？ あいつ、駅へ向かってるのか！」", effect: "gps", loc: "Neo-Osaka-ST", chara: "haruto" },
         { name: "システム", text: "", bg: "osaka01" },
-        { name: "ハルト", text: "「ハァ、ハァ……！ やっと着いた。えーっとGPSの方向は……北. ……この先にあるのは、 KYOTOか！……って、ゲートが閉まった……！？ くそっ、あいつが強引に突破したせいで……！」", chara: "haruto", bg: "osakaeki01" },
+        { name: "ハルト", text: "「ハァ、ハァ……！ やっと着いた。えーっとGPSの方向は……北。……この先にあるのは、 KYOTOか！……って、ゲートが閉まった……！？ くそっ、あいつが強引に突破したせいで……！」", chara: "haruto", bg: "osakaeki01" },
         { name: "駅アナウンス", text: "『警告。システムを警戒モードへ移行します。復旧には管理パスワードが必要です』" },
-        { name: "ハルト", text: "「……仕方ない、緊急事態だ！モバイル端末から駅のシステムへアクセスするぞ. …よし、この二つのゲートを突破すれば……」", chara: "haruto", note: { id: "n2", title: "駅の管理パスワード", body: "リニア『ツルギ』を遠隔操作するための父のメモ。" } },
+        { name: "ハルト", text: "「……仕方ない、緊急事態だ！モバイル端末から駅のシステムへアクセスするぞ。…よし、この二つのゲートを突破すれば……」", chara: "haruto", note: { id: "n2", title: "駅の管理パスワード", body: "リニア『ツルギ』を遠隔操作するための父のメモ。" } },
         { name: "システム", text: "セキュリティゲートを突破して、警戒モードを解除しましょう。", jump: "game.html" },
         { name: "ハルト", text: "「……よし、承認された！ システムリブート！ いけ……動けッ！！」", chara: "haruto", bg: "osakaeki01" },
         { name: "システム", text: "", effect: "success" },
@@ -314,18 +314,18 @@
         { name: "謎の男", text: "「そうだな、…いや、案外そうでも無いかもしれんぞ」", chara: "kage" },
         { name: "ハルト", text: "「は！？ 何言ってんだよ……？ お前、 一体何者なんだ？」", chara: "haruto" },
         { name: "警備ドローン", text: "『……目標発見。ハルト……ハルト・アマツを確認』", effect: "error", chara: "drone" },
-        { name: "ハルト", text: "「っ！？ なんだこいつら……！？ なんで、なんで僕の名前を知ってるんだよ！」", chara: "haruto" },
+        { name: "ハルト", text: "「っ！？ なんだこいつら……！？ なんで, なんで僕の名前を知ってるんだよ！」", chara: "haruto" },
         { name: "ハルト", text: "「……そうか、 お前の差し金か. こいつらを使って、僕を待ち伏せしてたのか！」", chara: "haruto" },
         { name: "謎の男", text: "「……そいつらは警備用のドローン『ヤタガラス』だ。 気をつけたほうがいいぜ」", chara: "kage" },
         { name: "謎の男", text: "「弾はゴム製だが、 まともに食らえば骨の二、 三本は覚悟しなきゃならない」", chara: "kage" },
-        { name: "ハルト", text: "「……っ、 脅しのつもりかよ！ それとも性能を自慢したいだけか！？」", chara: "haruto" },
+        { name: "ハルト", text: "「……っ, 脅しのつもりかよ！ それとも性能を自慢したいだけか！？」", chara: "haruto" },
         { name: "謎の男", text: "「……自慢じゃない。 ……事実を言ったまでだ」", chara: "kage" },
         { name: "謎の男", text: "「……すまないが, こいつはまだ返せない. ……連れていく」", chara: "kage" },
         { name: "ハルト", text: "「待て！ 行かせるかよ！」", chara: "haruto" },
         { name: "謎の男", text: "「……取り戻したければ、来い。 ……かつて、 こいつが生まれた場所に」", chara: "kage" },
         { name: "ハルト", text: "「……っ！？ 『コドウが生まれた場所』……？ 、どういうことだ！？」", chara: "haruto" },
         { name: "謎の男", text: "「……詳しい場所は、 そのノートを見れば思い出すはずだ。 ……そこで待っている」", chara: "kage" },
-        { name: "システム", text: "ヤタガラスと共に、 謎の男が逃走していく", chara: "drone" },
+        { name: "システム", text: "ヤタガラスと共に, 謎の男が逃走していく", chara: "drone" },
         { name: "ハルト", text: "「……あいつ、ドローンを操ってやがった。 ……それにしても……あいつ、一体何が目的なんだ……？」", chara: "haruto" },
         { name: "システム", text: "研究ノートを開いて、研究施設への経路を割り出しましょう。", input: { guide: "ひらがなで入力してください", ans: "かみ" }, note: { id: "n3", title: "八百万の電脳街", body: "京都のジャンク屋で入手した手がかり。" } },
         { name: "ハルト", text: "「そうだ！さっきノートの間から出てきた封筒を開けよう。」", chara: "haruto" },
@@ -333,7 +333,7 @@
         { name: "ハルト", text: "「目的地の座標が分かったぞ！端末に座標をセット。…よし、そんなには遠くないぞ。」", chara: "haruto" },
         { name: "ハルト", text: "「……この辺りだ。 お父さんの旧・京都研究所. ……間違いない、幼い頃に一度だけ連れてきてもらった、あの風景だ」", bg: "kenkyu01", chara: "haruto" },
         { name: "ハルト", text: "「……それにしても. ……あいつ, どうして『ここ』を知っていたんだ？」", chara: "haruto" },
-        { name: "ハルト", text: "「（立ち止まり、空を見上げる）……まさか. ……あれは、お父さん……？ ……いや, そんなはずはない。でも, もしそうなら……どうしてあんな強引な真似を……何か理由があるのか…？」", chara: "haruto" },
+        { name: "ハルト", text: "「あれは、お父さん……？ ……いや, そんなはずはない。でも, もしそうなら……どうしてあんな強引な真似を……何か理由があるのか…？」", chara: "haruto" },
         { name: "システム", text: "研究施設へ到着", bg: "kenkyu01" },
         { name: "ハルト", text: "「……誰もいない. ……ハァ, ハァ……！ コドウ! どこだ！ 返事をしてくれ！」", chara: "haruto" },
         { name: "ハルト", text: "「……くそっ, GPSの信号も完全に途切れてる. ……あいつ、僕をからかったのか？」", chara: "haruto" },
@@ -342,7 +342,7 @@
         { name: "システム", text: "ドン！" },
         { name: "ハルト", text: "「……え？ ……この音、まさか……」", chara: "haruto" },
         { name: "コドウ", text: "「ドン！ カカッ！ ……ハルト、遅いよ！ 待ちくたびれちゃった！」", chara: "kodou" },
-        { name: "ハルト", text: "「（目を見開き, 駆け寄る）……コドウ！ ……怪我はないか？」", chara: "haruto_kodou" },
+        { name: "ハルト", text: "「コドウ！ ……怪我はないか？」", chara: "haruto_kodou" },
         { name: "コドウ", text: "「全然平気！ なんだか体が、前よりずっと軽くなったみたいだよ！」", chara: "kodou" },
         { name: "ハルト", text: "「……よかった. ……本当によかった……！」", chara: "haruto_kodou" },
         { name: "ハルト", text: "「……独自調査を続けていたあの男はどこへ行ったんだ……？」", chara: "haruto" },
@@ -356,7 +356,7 @@
         { name: "ハルト", text: "「……ハァ, はぁ……！ 上手く逃げ出せたぞ」", bg_png: "teien01", chara: "haruto" },
         { name: "ハルト", text: "「……っ！？ 嘘だろ, あいつ……. なんでこんなところに……」", chara: "haruto" },
         { name: "ドローン", text: "『……警告. 抵抗を止め、直ちにあの個体を渡せ. データを差し出せば、命までは取らん』", chara: "drone" },
-        { name: "謎の男", text: "「（膝をつき、端末を庇いながら）……断る. ……コドウを, 人殺しの道具には……させない……！」", chara: "kage" },
+        { name: "謎の男", text: "「断る. ……コドウを, 人殺しの道具には……させない……！」", chara: "kage" },
         { name: "ハルト", text: "「……あいつ、攻撃されてる……？ ドローンの仲間じゃなかったのか」", chara: "haruto" },
         { name: "コドウ", text: "「ドン……. ハルト、お願い, 助けてあげて. ……この人、悪い人じゃないよ」", chara: "kodou" },
         { name: "ハルト", text: "「コドウ……？」", chara: "haruto" },
@@ -373,9 +373,9 @@
         { name: "ハルト", text: "「なっ……！？ 嘘だろ、墜落どころか自爆……！？」", chara: "haruto" },
         { name: "謎の男", text: "「……バカな, モード：アルファが拒絶された……！？まずいぞ、自爆されたら周辺一帯が大惨事になる！」", chara: "kage" },
         { name: "ハルト", text: "「おい、しっかりしてくれよ！ 解除キー、解除キーはどこだ……！？」", chara: "haruto" },
-        { name: "システム", text: "研究ノートを見て「ドローンセキュリティの謎」を解明しよう。", input: { guide: "コマンドを入力してください", ans: "さいきどう", onMissStep: 91 } },
+        { name: "システム", text: "研究ノートを見て「ドローンセキュリティの謎」を解明しよう。", input: { guide: "コマンドを入力してください", ans: "さいきどう", onMissStep: 105 } },
         { name: "システム", text: "エラーメッセージ：コマンドが正しくありません。自爆シークエンスが加速します。", effect: "error", chara: "drone" },
-        { name: "ハルト", text: "「え？！間違ったということか？！くそっ、もう一度よく見直してみよう」", chara: "haruto", input: { guide: "コマンドを入力してください", ans: "さいきどう", onMissStep: 91 } },
+        { name: "ハルト", text: "「え？！間違ったということか？！くそっ、もう一度よく見直してみよう」", chara: "haruto", input: { guide: "コマンドを入力してください", ans: "さいきどう", onMissStep: 105 } },
         { name: "システム", text: "", effect: "success", chara: "drone" },
         { name: "ハルト", text: "「……はぁ, はぁ……. ……止まった……」", chara: "haruto" },
         { name: "謎の男", text: "「……フッ. ……よくやったな, ハルト. ……助かったよ」", chara: "kage" },
