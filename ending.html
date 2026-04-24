@@ -3,73 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>夜明けの残響 - Epilogue</title>
+    <title>Epilogue - ワンナイト・リクレイマー</title>
     <style>
-        body, html { margin: 0; padding: 0; width: 100%; height: 100dvh; background: #050505; overflow: hidden; display: flex; justify-content: center; align-items: center; }
+        :root { --cyber-blue: #00f2ff; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100dvh; background: #000; overflow: hidden; display: flex; justify-content: center; align-items: center; color: #fff; font-family: "Sawarabi Mincho", serif; }
+        
+        #stage { position: relative; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; background: #000; }
+        video { width: 100%; height: 100%; object-fit: cover; display: none; }
 
-        #stage {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: #000;
+        /* 再生ボタン：物語の終焉に合わせたデザイン */
+        #start-btn {
+            position: relative; padding: 15px 40px;
+            background: transparent; color: var(--cyber-blue);
+            border: 2px solid var(--cyber-blue);
+            cursor: pointer; font-weight: bold; font-family: sans-serif;
+            letter-spacing: 0.2em;
+            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.3);
+            text-align: center;
+            z-index: 100;
         }
 
-        video { width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 1.5s ease-in; }
-
+        /* 終了後のエンドカード */
         #end-card {
-            position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center;
-            background: rgba(0, 0, 0, 0.7); opacity: 0; pointer-events: none; transition: opacity 2.5s ease; z-index: 10;
+            position: absolute; inset: 0;
+            display: none; flex-direction: column; justify-content: center;
+            align-items: center; background: #000;
+            z-index: 200; opacity: 0; transition: opacity 2s ease;
         }
-        #end-card.active { opacity: 1; pointer-events: auto; }
-
-        .thank-you { color: #00f2ff; font-family: "Sawarabi Mincho", serif; font-size: 1.2rem; letter-spacing: 0.2em; text-shadow: 0 0 10px rgba(0, 242, 255, 0.8); margin-bottom: 40px; text-align: center; }
-
-        .btn-return {
-            padding: 15px 40px; background: transparent; color: #00f2ff; border: 1px solid #00f2ff; cursor: pointer;
-            font-family: sans-serif; font-weight: bold; font-size: 0.9rem; clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
-            text-decoration: none; box-shadow: 0 0 15px rgba(0, 242, 255, 0.2);
-        }
-
-        #tap-to-play { position: absolute; inset: 0; z-index: 20; display: flex; justify-content: center; align-items: center; color: rgba(0, 242, 255, 0.5); font-size: 0.8rem; letter-spacing: 0.1em; }
-
-        /* パターンB: PC（横長画面）の時だけ、表示幅を9:16に制限する */
-        @media (min-aspect-ratio: 1/1) {
-            #stage {
-                height: 100dvh;
-                aspect-ratio: 9 / 16;
-                width: auto;
-                box-shadow: 0 0 100px rgba(0,0,0,1), 0 0 20px rgba(0, 242, 255, 0.2);
-                border-left: 1px solid rgba(0, 242, 255, 0.1);
-                border-right: 1px solid rgba(0, 242, 255, 0.1);
-            }
+        .thank-you { color: var(--cyber-blue); font-size: 1.5rem; letter-spacing: 0.3em; margin-bottom: 40px; text-align: center; }
+        .btn-return { 
+            padding: 12px 30px; background: transparent; color: var(--cyber-blue); 
+            border: 1px solid var(--cyber-blue); text-decoration: none; font-size: 0.9rem;
+            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
         }
     </style>
 </head>
 <body>
     <div id="stage">
-        <video id="ending-video" playsinline webkit-playsinline>
-            <source src="img/ending.mp4" type="video/mp4">
-        </video>
-        <div id="tap-to-play">TAP TO START</div>
+        <div id="start-btn" onclick="playEnding()">DECRYPT EPILOGUE</div>
+
+        <video id="v" src="img/ending.mp4" playsinline webkit-playsinline></video>
+
         <div id="end-card">
-            <div class="thank-you">― 完 ―<br><br>THANK YOU FOR PLAYING</div>
+            <div class="thank-you">― 完 ―</div>
             <a href="index.html" class="btn-return">TO TITLE</a>
         </div>
     </div>
 
     <script>
-        const video = document.getElementById('ending-video'), endCard = document.getElementById('end-card'), tapUI = document.getElementById('tap-to-play');
-        function startSequence() { tapUI.style.display = 'none'; video.style.opacity = '1'; video.play(); }
-        window.addEventListener('click', () => { if (video.paused) startSequence(); }, { once: true });
-        window.addEventListener('DOMContentLoaded', () => {
-            setTimeout(() => {
-                video.play().then(() => { tapUI.style.display = 'none'; video.style.opacity = '1'; }).catch(() => {});
-            }, 500);
-        });
-        video.onended = () => { video.style.transition = 'opacity 2s ease'; video.style.opacity = '0'; setTimeout(() => { endCard.classList.add('active'); }, 800); };
+        const v = document.getElementById('v');
+        const b = document.getElementById('start-btn');
+        const ec = document.getElementById('end-card');
+
+        function playEnding() {
+            b.style.display = 'none';
+            v.style.display = 'block';
+
+            v.play().catch(e => {
+                console.error("Playback Error:", e);
+                alert("再生エラー: エンディングデータが見つかりません。\nimg/ending.mp4 のパスを確認してください。");
+            });
+        }
+
+        // 動画が終了した時の処理
+        v.onended = () => { 
+            v.style.display = 'none';
+            ec.style.display = 'flex';
+            setTimeout(() => ec.style.opacity = '1', 100);
+        };
+
+        // 読み込みエラー
+        v.onerror = () => {
+            alert("動画の読み込みに失敗しました。形式が H.264 であるか確認してください。");
+        };
     </script>
 </body>
 </html>
