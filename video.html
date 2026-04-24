@@ -8,12 +8,16 @@
         :root { --cyber-blue: #00f2ff; }
         body, html { margin:0; padding:0; width:100%; height:100dvh; background:#000; overflow:hidden; font-family: sans-serif; }
         #stage { position:relative; width:100%; height:100%; display:flex; justify-content:center; align-items:center; }
-        video { width:100%; height:100%; object-fit:cover; display:none; }
         
+        /* 動画：最初は非表示 */
+        video { width: 100%; height: 100%; object-fit: cover; display: none; }
+        
+        /* ローディング：中央のスピナー */
         #loading-ui { text-align: center; z-index: 10; }
         .spinner { width: 40px; height: 40px; border: 3px solid rgba(0, 242, 255, 0.2); border-top: 3px solid var(--cyber-blue); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 15px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
+        /* 再生ボタン：読み込み完了後に出現 */
         #play-overlay {
             position:absolute; inset:0; background:rgba(0,0,0,0.9);
             display:none; flex-direction:column; justify-content:center; align-items:center;
@@ -23,6 +27,7 @@
             padding:15px 40px; border:2px solid var(--cyber-blue); color:var(--cyber-blue);
             background:transparent; font-weight:bold; letter-spacing:0.2em;
             clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.3);
         }
     </style>
 </head>
@@ -35,7 +40,7 @@
 
         <div id="play-overlay" onclick="handleStart()">
             <div class="btn-play">START VIDEO</div>
-            <p style="color:var(--cyber-blue); font-size:0.7rem; margin-top:15px;">タップして再生</p>
+            <p style="color:var(--cyber-blue); font-size:0.7rem; margin-top:15px;">タップして再生を開始</p>
         </div>
         
         <video id="v" playsinline webkit-playsinline preload="auto">
@@ -48,7 +53,7 @@
         const overlay = document.getElementById('play-overlay');
         const loader = document.getElementById('loading-ui');
 
-        // スマホでは canplaythrough が発火しにくい場合があるため複数のイベントを監視
+        // 動画の読み込みイベントを複数監視して、ボタンを出すタイミングを決定
         const onReady = () => {
             loader.style.display = 'none';
             overlay.style.display = 'flex';
@@ -58,7 +63,7 @@
         v.addEventListener('canplaythrough', onReady);
         v.addEventListener('loadeddata', onReady);
 
-        // 強制表示タイマー（スマホの低速回線対策）
+        // 低速回線やエラー時のための保険（3秒経ったら強制的にボタンを出す）
         setTimeout(() => {
             if (overlay.style.display === 'none') onReady();
         }, 3000);
@@ -67,23 +72,21 @@
             v.style.display = 'block';
             overlay.style.display = 'none';
             
-            // スマホの「省電力モード」などで再生が拒否されるのを防ぐための記述
-            const playPromise = v.play();
-            if (playPromise !== undefined) {
-                playPromise.catch(error => {
-                    console.log("Auto-play blocked, retrying muted...");
-                    // 万が一の時、ミュートにしてでも再生させる最終手段（音が必要ならここはalertにする）
-                    v.muted = true;
-                    v.play();
-                    alert("音声再生が制限されています。端末のマナーモードを解除してください。");
-                });
-            }
+            // タップ操作直後に再生を叩く（これで音付き再生が許可される）
+            v.play().catch(e => {
+                console.log("Error:", e);
+                // それでも失敗した場合はミュートで再生（最終手段）
+                v.muted = true;
+                v.play();
+            });
         }
 
+        // 動画終了時に本編へ（modeを付けてジャンプ）
         v.onended = () => { location.href = 'index.html?mode=after_video'; };
-        // エラーハンドリング
+
+        // 致命的なエラー検知
         v.onerror = () => {
-            alert("動画の読み込みに失敗しました。回線状況が良い場所で再試行してください。");
+            alert("動画データの読み込みに失敗しました。パスを確認してください。");
         };
     </script>
 </body>
