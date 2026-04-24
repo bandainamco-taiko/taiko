@@ -47,7 +47,7 @@
         @keyframes rotate-radar { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         @keyframes blink-target { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.2); } }
 
-        #msg-window { height: var(--msg-height); width: 100%; background: var(--wa-indigo); border-top: 2px solid var(--cyber-blue); padding: 20px 25px; box-sizing: border-box; cursor: pointer; z-index: 5; position: absolute; bottom: 0; left: 0; display: none; }
+        #msg-window { height: var(--msg-window-height); width: 100%; background: var(--wa-indigo); border-top: 2px solid var(--cyber-blue); padding: 20px 25px; box-sizing: border-box; cursor: pointer; z-index: 5; position: absolute; bottom: 0; left: 0; display: none; }
         #speaker-name { font-weight:bold; color:var(--cyber-blue); margin-bottom:8px; height:1.2em; font-family: sans-serif; font-size: 0.9rem; }
         #message-text { font-size: 1rem; line-height: 1.6; white-space: pre-wrap; }
         
@@ -203,7 +203,6 @@
     }
 
     function updateVisuals(data) {
-        // 画像形式（jpg/png）の指定に対応
         if (data.bg) document.getElementById('bg-area').style.backgroundImage = `url('img/${data.bg}.jpg')`;
         if (data.bg_png) document.getElementById('bg-area').style.backgroundImage = `url('img/${data.bg_png}.png')`;
         
@@ -240,7 +239,9 @@
     window.addEventListener('DOMContentLoaded', () => {
         const urlParams = new URLSearchParams(window.location.search);
         const mode = urlParams.get('mode');
-        if (mode === 'after_video' || mode === 'after_game') {
+        
+        // 再読み込み時のフリーズ対策を強化
+        if (mode === 'after_video' || mode === 'after_game' || currentStep > 0) {
             document.getElementById('title-screen').remove();
             document.getElementById('msg-window').style.display = 'block';
             if (mode === 'after_video') currentStep = 28;
@@ -279,7 +280,7 @@
         { name: "システム", text: "", effect: "success" },
         { name: "駅アナウンス", text: "『管理コード承認. ゲートを開きます。機体「ツルギ」、緊急シークエンスを解除. 目的地：KYOTO』", bg: "osakaeki02" },
         { name: "ハルト", text: "「目的地は京都だ。……待ってろよ、コドウ. 必ず, 僕が助け出すから」", chara: "haruto", videoTrigger: true },
-        { name: "ハルト", text: "「……ここが、KYOTO. ……この霧, ただの霧じゃない. ナノマシンのノイズだ. GPSが位置を特定できない！」", bg: "kyotoeki01", chara: "haruto" },
+        { name: "ハルト", text: "「（京都駅に到着して）……ここが、KYOTO. ……この霧, ただの霧じゃない. ナノマシンのノイズだ. GPSが位置を特定できない！」", bg: "kyotoeki01", chara: "haruto" },
         { name: "ハルト", text: "「アイツどこに行ったんだ……」", chara: "haruto" },
         { name: "ドンダー少年", text: "「さっきの太鼓型ロボット、かわいかったなぁ、でもアイツ全然触らせてくれなかったなぁ…」", chara: "boy" },
         { name: "ハルト", text: "「ちょっと君！その男どこに行ったか教えてくれないか？」", chara: "haruto" },
@@ -291,7 +292,7 @@
         { name: "ハルト", text: "「ありがとう！店の名前は『八百万ジャンク』、急ごう！」", chara: "haruto" },
         { name: "システム", text: "八百万ジャンクに到着", bg: "yaorozu01" },
         { name: "ハルト", text: "「はぁ、はぁ……追いついたぞ. ……さあ、コドウを返せ！ 今すぐだ！」", chara: "haruto" },
-        { name: "謎の男", text: "「……悪いな. だが, こいつはまだ返せない. 」", chara: "kage" },
+        { name: "謎の男", text: "「（ゆっくりと振り返り）……悪いな. だが, こいつはまだ返せない. 」", chara: "kage" },
         { name: "ハルト", text: "「返せない！？ 勝手なことを言うな！ 僕の相棒だ, お前に触られる筋合いはない！」", chara: "haruto" },
         { name: "謎の男", text: "「そうか？いや、案外そうでも無いかもしれんぞ」", chara: "kage" },
         { name: "ハルト", text: "「は！？ 何言ってんだよ……？ お前, 一体何者なんだ？」", chara: "haruto" },
@@ -324,7 +325,7 @@
         { name: "システム", text: "ドン！" },
         { name: "ハルト", text: "「……え？ ……この音、まさか……」", chara: "haruto" },
         { name: "コドウ", text: "「ドン！ カカッ！ ……ハルト、遅いよ！ 待ちくたびれちゃった！」", chara: "kodou" },
-        { name: "ハルト", text: "「……コドウ！ ……怪我はないか？」", chara: "haruto_kodou" },
+        { name: "ハルト", text: "「（目を見開き, 駆け寄る）……コドウ！ ……怪我はないか？」", chara: "haruto_kodou" },
         { name: "コドウ", text: "「全然平気！ なんだか体が、前よりずっと軽くなったみたいだよ！」", chara: "kodou" },
         { name: "ハルト", text: "「……よかった. ……本当によかった……！」", chara: "haruto_kodou" },
         { name: "ハルト", text: "「……独自調査を続けていたあの男はどこへ行ったんだ……？」", chara: "haruto" },
@@ -359,17 +360,13 @@
         { name: "システム", text: "エラーメッセージ：コマンドが正しくありません。自爆シークエンスが加速します。", effect: "error", chara: "drone" },
         { name: "ハルト", text: "「え？！間違ったということか？！くそっ、もう一度よく見直してみよう」", chara: "haruto", input: { guide: "コマンドを入力してください", ans: "さいきどう" } },
         { name: "システム", text: "（SE：制限時間ギリギリでハルトがキーを入力. ドローンが沈黙する）", effect: "success", chara: "drone" },
-        { name: "ハルト", text: "「……はぁ, はぁ……. ……止まった……
-」", chara: "haruto" },
+        { name: "ハルト", text: "「……はぁ, はぁ……. ……止まった……」", chara: "haruto" },
         { name: "謎の男", text: "「……フッ. ……よくやったな, ハルト. ……助かったよ」", chara: "kage" },
         { name: "ハルト", text: "「『助かったよ』じゃないだろ！ お前, お父さんのプロトコルが通用するかどうかも分かってなかったのか？」", chara: "haruto" },
         { name: "謎の男", text: "「……いや、完全に俺のミスだ. 博士の設計に、手が加えられてしまっているようだ」", chara: "kage" },
-        { name: "ハルト", text: "「詰めが甘いんだよ. しっかりしなよ, エンジニア失格だぞ
-」", chara: "haruto" },
-        { name: "謎の男", text: "「……そうだな. ……全く、その通りだ. ……手厳しいな、お前は
-」", chara: "kage" },
-        { name: "ハルト", text: "「本当のことだろ. ……次はもっと、ちゃんとやってくれよ
-」", chara: "haruto" },
+        { name: "ハルト", text: "「詰めが甘いんだよ. しっかりしなよ, エンジニア失格だぞ」", chara: "haruto" },
+        { name: "謎の男", text: "「……そうだな. ……全く、その通りだ. ……手厳しいな、お前は」", chara: "kage" },
+        { name: "ハルト", text: "「本当のことだろ. ……次はもっと、ちゃんとやってくれよ」", chara: "haruto" },
         { name: "謎の男", text: "「……ああ、そうだな、…約束するよ. だからハルト, お前も今のその言葉、しっかりと覚えておいてくれ. ……『詰めを甘くするな』. ……」", chara: "kage" },
         { name: "システム", text: "―― THE END ――", endingTrigger: true }
     ];
