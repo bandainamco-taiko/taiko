@@ -2,91 +2,45 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ワンナイト・リクレイマー</title>
     <style>
-        :root { --cyber-blue: #00f2ff; }
-        body, html { margin:0; padding:0; width:100%; height:100dvh; background:#000; overflow:hidden; font-family: sans-serif; }
-        #stage { position:relative; width:100%; height:100%; display:flex; justify-content:center; align-items:center; }
-        
-        /* 動画：最初は非表示 */
-        video { width: 100%; height: 100%; object-fit: cover; display: none; }
-        
-        /* ローディング：中央のスピナー */
-        #loading-ui { text-align: center; z-index: 10; }
-        .spinner { width: 40px; height: 40px; border: 3px solid rgba(0, 242, 255, 0.2); border-top: 3px solid var(--cyber-blue); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 15px; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        /* 再生ボタン：読み込み完了後に出現 */
-        #play-overlay {
-            position:absolute; inset:0; background:rgba(0,0,0,0.9);
-            display:none; flex-direction:column; justify-content:center; align-items:center;
-            z-index:100; cursor:pointer;
-        }
-        .btn-play {
-            padding:15px 40px; border:2px solid var(--cyber-blue); color:var(--cyber-blue);
-            background:transparent; font-weight:bold; letter-spacing:0.2em;
-            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
-            box-shadow: 0 0 15px rgba(0, 242, 255, 0.3);
-        }
+        body { margin:0; background:#000; display:flex; justify-content:center; align-items:center; height:100dvh; overflow:hidden; color:#00f2ff; font-family:sans-serif; }
+        video { width:100%; height:100%; object-fit:cover; display:none; }
+        #start-btn { padding:20px 40px; border:2px solid #00f2ff; cursor:pointer; font-weight:bold; background:rgba(0,242,255,0.1); }
     </style>
 </head>
 <body>
-    <div id="stage">
-        <div id="loading-ui">
-            <div class="spinner"></div>
-            <div style="color:var(--cyber-blue); font-size:0.8rem;">LOADING SYSTEM..</div>
-        </div>
 
-        <div id="play-overlay" onclick="handleStart()">
-            <div class="btn-play">START VIDEO</div>
-            <p style="color:var(--cyber-blue); font-size:0.7rem; margin-top:15px;">タップして再生を開始</p>
-        </div>
-        
-        <video id="v" playsinline webkit-playsinline preload="auto">
-            <source src="img/opening.mp4" type="video/mp4">
-        </video>
-    </div>
+    <div id="start-btn" onclick="playVideo()">START SYSTEM</div>
+
+    <video id="myVideo" playsinline webkit-playsinline>
+        <source src="img/opening.mp4" type="video/mp4">
+        お使いのブラウザは動画再生に対応していません。
+    </video>
 
     <script>
-        const v = document.getElementById('v');
-        const overlay = document.getElementById('play-overlay');
-        const loader = document.getElementById('loading-ui');
+        const v = document.getElementById('myVideo');
+        const b = document.getElementById('start-btn');
 
-        // 動画の読み込みイベントを複数監視して、ボタンを出すタイミングを決定
-        const onReady = () => {
-            loader.style.display = 'none';
-            overlay.style.display = 'flex';
-        };
-
-        v.addEventListener('canplay', onReady);
-        v.addEventListener('canplaythrough', onReady);
-        v.addEventListener('loadeddata', onReady);
-
-        // 低速回線やエラー時のための保険（3秒経ったら強制的にボタンを出す）
-        setTimeout(() => {
-            if (overlay.style.display === 'none') onReady();
-        }, 3000);
-
-        function handleStart() {
+        function playVideo() {
+            // ボタンを消して動画を出す
+            b.style.display = 'none';
             v.style.display = 'block';
-            overlay.style.display = 'none';
-            
-            // タップ操作直後に再生を叩く（これで音付き再生が許可される）
+
+            // 再生命令
             v.play().catch(e => {
-                console.log("Error:", e);
-                // それでも失敗した場合はミュートで再生（最終手段）
-                v.muted = true;
-                v.play();
+                console.error(e);
+                alert("再生エラーが発生しました。\nファイル：img/opening.mp4 が存在するか確認してください。");
             });
         }
 
-        // 動画終了時に本編へ（modeを付けてジャンプ）
+        // 終わったら次へ
         v.onended = () => { location.href = 'index.html?mode=after_video'; };
 
-        // 致命的なエラー検知
+        // 読み込みエラーが起きたらすぐ報告
         v.onerror = () => {
-            alert("動画データの読み込みに失敗しました。パスを確認してください。");
+            alert("サーバー上の動画ファイルを読み込めません。\nパス間違いか、サーバーの設定（MIMEタイプ）が原因です。");
         };
     </script>
 </body>
