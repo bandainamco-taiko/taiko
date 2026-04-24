@@ -47,7 +47,7 @@
         @keyframes rotate-radar { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         @keyframes blink-target { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.2); } }
 
-        #msg-window { height: var(--msg-window-height); width: 100%; background: var(--wa-indigo); border-top: 2px solid var(--cyber-blue); padding: 20px 25px; box-sizing: border-box; cursor: pointer; z-index: 5; position: absolute; bottom: 0; left: 0; display: none; }
+        #msg-window { height: var(--msg-height); width: 100%; background: var(--wa-indigo); border-top: 2px solid var(--cyber-blue); padding: 20px 25px; box-sizing: border-box; cursor: pointer; z-index: 5; position: absolute; bottom: 0; left: 0; display: none; }
         #speaker-name { font-weight:bold; color:var(--cyber-blue); margin-bottom:8px; height:1.2em; font-family: sans-serif; font-size: 0.9rem; }
         #message-text { font-size: 1rem; line-height: 1.6; white-space: pre-wrap; }
         
@@ -138,7 +138,7 @@
 
     function initGame() { 
         document.getElementById('game-container').style.display = 'flex'; 
-        loadGame(); // ここで currentStep が復元される
+        loadGame();
     }
 
     function startGame() { 
@@ -203,6 +203,7 @@
     }
 
     function updateVisuals(data) {
+        // 画像形式（jpg/png）の指定に対応
         if (data.bg) document.getElementById('bg-area').style.backgroundImage = `url('img/${data.bg}.jpg')`;
         if (data.bg_png) document.getElementById('bg-area').style.backgroundImage = `url('img/${data.bg_png}.png')`;
         
@@ -239,8 +240,6 @@
     window.addEventListener('DOMContentLoaded', () => {
         const urlParams = new URLSearchParams(window.location.search);
         const mode = urlParams.get('mode');
-        
-        // 黒い画面フリーズ対策：スタート画面を出すか、自動再開するかを明確に分離
         if (mode === 'after_video' || mode === 'after_game') {
             document.getElementById('title-screen').remove();
             document.getElementById('msg-window').style.display = 'block';
@@ -248,15 +247,13 @@
             if (mode === 'after_game') currentStep = 24;
             saveGame();
             showText();
-        } else {
-            // セーブデータがある場合、タイトル画面の「START」でその位置から再開される仕様
         }
     });
 
     const scenario = [
         { name: "ハルト", text: "「……OSAKA。ネオンの海と、牙をむくような技術がひしめき合う、僕の街」", bg: "haikei01", chara: "haruto" },
         { name: "ハルト", text: "「こいつは『コドウ』。……ロボット工学の第一人者であるお父さんが、NASAへ行く前に僕に作ってくれた、特別な相棒」", chara: "haruto_kodou" },
-        { name: "コドウ", text: "「ドン！ ハルト、今日の調子はどう？」", chara: "kodou" },
+        { name: "コドウ", text: "「（和風な電子音で）ドン！ ハルト、今日の調子はどう？」", chara: "kodou" },
         { name: "ハルト", text: "「今日は特別なメンテナンスをして、コドウをパワーアップさせて父さんを驚かせてやるんだ。」", chara: "haruto" },
         { name: "システム", text: "（ハルト、ヘッドホンを装着し、メンテナンスを開始する）", chara: "haruto_kodou" },
         { name: "システム", text: "（画面フラッシュ ＆ エラーSE音演出）", effect: "error" },
@@ -265,7 +262,7 @@
         { name: "ハルト", text: "「誰だ！？ コドウに触るな！」", chara: "haruto" },
         { name: "謎の男", text: "「……静かにしてくれ。……急がなければ。」", chara: "kage" },
         { name: "システム", text: "謎の男がコドウを抱え、窓から夜の街へ消えていった" },
-        { name: "ハルト", text: "「……そんな, 嘘だろ。……コドウ……。僕の大事な、たった一人の相棒なのに……」", chara: "haruto" },
+        { name: "ハルト", text: "「……そんな, 嘘だろ。……コドウ……. 僕の大事な、たった一人の相棒なのに……」", chara: "haruto" },
         { name: "父の声（回想）", text: "『いいか、ハルト。こいつは世界一のロボットだ。宇宙の果てでも、私とお前を繋いでくれる。……迷子になんて、絶対にならないさ』" },
         { name: "ハルト", text: "「……そうだ。お父さん、言ってたじゃないか。……『迷子にならない』って。」", chara: "haruto" },
         { name: "ハルト", text: "「よし、管理用端末にログインして、……あった！ 高精度GPSユニット！……よしこれで……？！ダメだ、パスワードでロックされている。」", chara: "haruto" },
@@ -273,15 +270,15 @@
         { name: "システム", text: "研究ノートを開きパスワードを解明しましょう。", input: { guide: "パスワードを入力してください", ans: "trace" } },
         { name: "ハルト", text: "「……よし、やったぞ！ コドウの信号をキャッチしたぞ。……『OSAKA中央駅』？ あいつ、駅へ向かってるのか！」", effect: "gps", loc: "Neo-Osaka-ST", chara: "haruto" },
         { name: "システム", text: "", bg: "osaka01" },
-        { name: "ハルト", text: "「ハァ、ハァ……！ やっと着いた。……って、ゲートが閉まった……！？ くそっ、あいつが強引に突破したせいで……！」", chara: "haruto" },
+        { name: "ハルト", text: "「ハァ、ハァ……！ やっと着いた。……って、ゲートが閉まった……！？ くそっ、あいつが強引に突破したせいで……！」", chara: "haruto", bg: "osakaeki01" },
         { name: "駅アナウンス", text: "『警告。システムを警戒モードへ移行します。復旧には管理パスワードが必要です』" },
         { name: "ハルト", text: "「方向は……北。……この先にあるのは, KYOTOか！」", chara: "haruto" },
         { name: "ハルト", text: "「……仕方ない、緊急事態だ！モバイル端末から駅のシステムへアクセスするぞ。…よし、この二つのゲートを突破すれば……」", chara: "haruto", note: { id: "n2", title: "駅の管理パスワード", body: "リニア『ツルギ』を遠隔操作するための父のメモ。" } },
         { name: "システム", text: "セキュリティゲートを突破して、警戒モードを解除しましょう。", jump: "game.html" },
-        { name: "ハルト", text: "「……よし、承認された！ システムリブート！ いけ……動けッ！！」", chara: "haruto", bg: "osaka02" },
+        { name: "ハルト", text: "「……よし、承認された！ システムリブート！ いけ……動けッ！！」", chara: "haruto", bg: "osakaeki01" },
         { name: "システム", text: "", effect: "success" },
-        { name: "駅アナウンス", text: "『管理コード承認. ゲートを開きます。機体「ツルギ」、緊急シークエンスを解除. 目的地：KYOTO』" },
-        { name: "ハルト", text: "「目的地は京都だ。……待ってろよ、コドウ. 必ず、僕が助け出すから」", chara: "haruto", videoTrigger: true },
+        { name: "駅アナウンス", text: "『管理コード承認. ゲートを開きます。機体「ツルギ」、緊急シークエンスを解除. 目的地：KYOTO』", bg: "osakaeki02" },
+        { name: "ハルト", text: "「目的地は京都だ。……待ってろよ、コドウ. 必ず, 僕が助け出すから」", chara: "haruto", videoTrigger: true },
         { name: "ハルト", text: "「……ここが、KYOTO. ……この霧, ただの霧じゃない. ナノマシンのノイズだ. GPSが位置を特定できない！」", bg: "kyotoeki01", chara: "haruto" },
         { name: "ハルト", text: "「アイツどこに行ったんだ……」", chara: "haruto" },
         { name: "ドンダー少年", text: "「さっきの太鼓型ロボット、かわいかったなぁ、でもアイツ全然触らせてくれなかったなぁ…」", chara: "boy" },
@@ -316,7 +313,7 @@
         { name: "ハルト", text: "「そうだ！さっきノートの間から出てきた封筒を開けよう。」", chara: "haruto" },
         { name: "システム", text: "封筒を開けて目的地の正確な座標を求めましょう。", input: { guide: "半角数字で入力してください", ans: "20010221" } },
         { name: "ハルト", text: "「目的地の座標が分かったぞ！端末に座標をセット。…そんなには遠くないぞ。」", chara: "haruto" },
-        { name: "ハルト", text: "「……この辺りだ. お父さんの旧・京都研究所. ……間違いない、幼い頃に一度だけ連れてきてもらった、あの風景だ」", bg: "kyotoeki01", chara: "haruto" },
+        { name: "ハルト", text: "「……この辺りだ. お父さんの旧・京都研究所. ……間違いない、幼い頃に一度だけ連れてきてもらった、あの風景だ」", bg: "kenkyu01", chara: "haruto" },
         { name: "ハルト", text: "「……それにしても. ……あいつ, どうして『ここ』を知っていたんだ？」", chara: "haruto" },
         { name: "ハルト", text: "「……まさか. ……あれは、お父さん……？ ……いや, そんなはずはない。でも, もしそうなら……どうしてあんな強引な真似を……何か理由があるのか…？」", chara: "haruto" },
         { name: "システム", text: "研究施設へ到着", bg: "kenkyu01" },
@@ -341,7 +338,7 @@
         { name: "ハルト", text: "「……はぁ, はぁ……！ 上手く逃げ出せたぞ」", bg_png: "teien01", chara: "haruto" },
         { name: "ハルト", text: "「……っ！？ 嘘だろ, あいつ……カゲじゃないか. なんでこんなところに……」", chara: "haruto" },
         { name: "ドローン", text: "『……警告. 抵抗を止め、直ちにあの個体を渡せ. データを差し出せば、命までは取らん』", chara: "drone" },
-        { name: "謎の男", text: "「……断る. ……コドウを, 人殺しの道具には……させない……！」", chara: "kage" },
+        { name: "謎の男", text: "「（膝をつき、端末を庇いながら）……断る. ……コドウを, 人殺しの道具には……させない……！」", chara: "kage" },
         { name: "ハルト", text: "「……あいつ、攻撃されてる……？ ドローンの仲間じゃなかったのか」", chara: "haruto" },
         { name: "コドウ", text: "「ドン……. ハルト、お願い, 助けてあげて. ……この人、悪い人じゃないよ」", chara: "kodou" },
         { name: "ハルト", text: "「コドウ……？」", chara: "haruto" },
@@ -351,7 +348,7 @@
         { name: "ハルト", text: "「たまたま通りかかっただけだよ！ ……借りは返す. コドウがそう言うなら, 信じてやる！」", chara: "haruto" },
         { name: "謎の男", text: "「……フッ. なら、口を動かす前に手を動かせ！俺が時間を稼ぐ. ドローンのセキュリティに侵入して、全機墜落させるんだ！」", chara: "kage" },
         { name: "謎の男", text: "「アマツ博士の研究ノートを見るんだ！ 救助用プロトコル……『モード：アルファ』を強制展開しろ！」", chara: "kage" },
-        { name: "ハルト", text: "「モード：アルファ……これか！ よし, いけっ！！」", chara: "haruto", effect: "success" },
+        { name: "ハルト", text: "「（ノートを必死にめくり、コードを叩き込む）モード：アルファ……これか！ よし, いけっ！！」", chara: "haruto", effect: "success" },
         { name: "システム", text: "", chara: "drone" },
         { name: "ハルト", text: "「……止まった！ やったぞ, 墜落しろッ！！」", chara: "haruto" },
         { name: "システム音声（警告）", text: "『警告. 不正なアクセスを検知. 防衛プロトコルが暴走モードへ移行します. 自爆シークエンス開始. 自爆まで残り30分』", effect: "error", chara: "drone" },
@@ -362,13 +359,17 @@
         { name: "システム", text: "エラーメッセージ：コマンドが正しくありません。自爆シークエンスが加速します。", effect: "error", chara: "drone" },
         { name: "ハルト", text: "「え？！間違ったということか？！くそっ、もう一度よく見直してみよう」", chara: "haruto", input: { guide: "コマンドを入力してください", ans: "さいきどう" } },
         { name: "システム", text: "（SE：制限時間ギリギリでハルトがキーを入力. ドローンが沈黙する）", effect: "success", chara: "drone" },
-        { name: "ハルト", text: "「……はぁ, はぁ……. ……止まった……」", chara: "haruto" },
+        { name: "ハルト", text: "「……はぁ, はぁ……. ……止まった……
+」", chara: "haruto" },
         { name: "謎の男", text: "「……フッ. ……よくやったな, ハルト. ……助かったよ」", chara: "kage" },
         { name: "ハルト", text: "「『助かったよ』じゃないだろ！ お前, お父さんのプロトコルが通用するかどうかも分かってなかったのか？」", chara: "haruto" },
         { name: "謎の男", text: "「……いや、完全に俺のミスだ. 博士の設計に、手が加えられてしまっているようだ」", chara: "kage" },
-        { name: "ハルト", text: "「詰めが甘いんだよ. しっかりしなよ, エンジニア失格だぞ」", chara: "haruto" },
-        { name: "謎の男", text: "「……そうだな. ……全く、その通りだ. ……手厳しいな、お前は」", chara: "kage" },
-        { name: "ハルト", text: "「本当のことだろ. ……次はもっと、ちゃんとやってくれよ」", chara: "haruto" },
+        { name: "ハルト", text: "「詰めが甘いんだよ. しっかりしなよ, エンジニア失格だぞ
+」", chara: "haruto" },
+        { name: "謎の男", text: "「……そうだな. ……全く、その通りだ. ……手厳しいな、お前は
+」", chara: "kage" },
+        { name: "ハルト", text: "「本当のことだろ. ……次はもっと、ちゃんとやってくれよ
+」", chara: "haruto" },
         { name: "謎の男", text: "「……ああ、そうだな、…約束するよ. だからハルト, お前も今のその言葉、しっかりと覚えておいてくれ. ……『詰めを甘くするな』. ……」", chara: "kage" },
         { name: "システム", text: "―― THE END ――", endingTrigger: true }
     ];

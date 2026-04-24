@@ -3,57 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>夜明けの残響 - Epilogue</title>
+    <title>Epilogue</title>
     <style>
-        body, html { margin: 0; padding: 0; width: 100%; height: 100dvh; background: #050505; overflow: hidden; display: flex; justify-content: center; align-items: center; }
-
-        #stage {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: #000;
-        }
-
+        :root { --cyber-blue: #00f2ff; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100dvh; background: #000; overflow: hidden; display: flex; justify-content: center; align-items: center; }
+        #stage { position: relative; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; background: #000; }
         video { width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 1.5s ease-in; }
 
-        #end-card {
-            position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center;
-            background: rgba(0, 0, 0, 0.7); opacity: 0; pointer-events: none; transition: opacity 2.5s ease; z-index: 10;
+        #loader {
+            position: absolute; width: 40px; height: 40px;
+            border: 3px solid rgba(0, 242, 255, 0.2);
+            border-top: 3px solid var(--cyber-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
         }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        #end-card { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; background: rgba(0, 0, 0, 0.7); opacity: 0; pointer-events: none; transition: opacity 2.5s ease; z-index: 10; }
         #end-card.active { opacity: 1; pointer-events: auto; }
+        .thank-you { color: var(--cyber-blue); font-family: serif; font-size: 1.2rem; letter-spacing: 0.2em; margin-bottom: 40px; text-align: center; }
+        .btn-return { padding: 15px 40px; background: transparent; color: var(--cyber-blue); border: 1px solid var(--cyber-blue); cursor: pointer; text-decoration: none; clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%); }
 
-        .thank-you { color: #00f2ff; font-family: "Sawarabi Mincho", serif; font-size: 1.2rem; letter-spacing: 0.2em; text-shadow: 0 0 10px rgba(0, 242, 255, 0.8); margin-bottom: 40px; text-align: center; }
-
-        .btn-return {
-            padding: 15px 40px; background: transparent; color: #00f2ff; border: 1px solid #00f2ff; cursor: pointer;
-            font-family: sans-serif; font-weight: bold; font-size: 0.9rem; clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
-            text-decoration: none; box-shadow: 0 0 15px rgba(0, 242, 255, 0.2);
-        }
-
-        #tap-to-play { position: absolute; inset: 0; z-index: 20; display: flex; justify-content: center; align-items: center; color: rgba(0, 242, 255, 0.5); font-size: 0.8rem; letter-spacing: 0.1em; }
-
-        /* パターンB: PC（横長画面）の時だけ、表示幅を9:16に制限する */
         @media (min-aspect-ratio: 1/1) {
-            #stage {
-                height: 100dvh;
-                aspect-ratio: 9 / 16;
-                width: auto;
-                box-shadow: 0 0 100px rgba(0,0,0,1), 0 0 20px rgba(0, 242, 255, 0.2);
-                border-left: 1px solid rgba(0, 242, 255, 0.1);
-                border-right: 1px solid rgba(0, 242, 255, 0.1);
-            }
+            #stage { height: 100dvh; aspect-ratio: 9 / 16; width: auto; box-shadow: 0 0 100px #000; }
         }
     </style>
 </head>
 <body>
     <div id="stage">
-        <video id="ending-video" playsinline webkit-playsinline>
+        <div id="loader"></div>
+        <video id="v" playsinline webkit-playsinline preload="auto">
             <source src="img/ending.mp4" type="video/mp4">
         </video>
-        <div id="tap-to-play">TAP TO START</div>
         <div id="end-card">
             <div class="thank-you">― 完 ―<br><br>THANK YOU FOR PLAYING</div>
             <a href="index.html" class="btn-return">TO TITLE</a>
@@ -61,15 +42,21 @@
     </div>
 
     <script>
-        const video = document.getElementById('ending-video'), endCard = document.getElementById('end-card'), tapUI = document.getElementById('tap-to-play');
-        function startSequence() { tapUI.style.display = 'none'; video.style.opacity = '1'; video.play(); }
-        window.addEventListener('click', () => { if (video.paused) startSequence(); }, { once: true });
-        window.addEventListener('DOMContentLoaded', () => {
-            setTimeout(() => {
-                video.play().then(() => { tapUI.style.display = 'none'; video.style.opacity = '1'; }).catch(() => {});
-            }, 500);
-        });
-        video.onended = () => { video.style.transition = 'opacity 2s ease'; video.style.opacity = '0'; setTimeout(() => { endCard.classList.add('active'); }, 800); };
+        const v = document.getElementById('v'), ec = document.getElementById('end-card'), ld = document.getElementById('loader');
+
+        v.oncanplaythrough = () => {
+            ld.style.display = 'none';
+            v.style.opacity = '1';
+            v.play().catch(() => {
+                window.addEventListener('click', () => v.play(), { once: true });
+            });
+        };
+
+        v.onended = () => {
+            v.style.transition = 'opacity 2s ease';
+            v.style.opacity = '0';
+            setTimeout(() => ec.classList.add('active'), 800);
+        };
     </script>
 </body>
 </html>
