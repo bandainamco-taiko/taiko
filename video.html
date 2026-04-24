@@ -3,29 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LOADING...</title>
+    <title>ワンナイト・リクレイマー</title>
     <style>
-        body, html { margin:0; padding:0; width:100%; height:100dvh; background:#000; overflow:hidden; }
+        :root { --cyber-blue: #00f2ff; }
+        body, html { margin:0; padding:0; width:100%; height:100dvh; background:#000; overflow:hidden; font-family: sans-serif; }
         #stage { position:relative; width:100%; height:100%; display:flex; justify-content:center; align-items:center; }
         video { width:100%; height:100%; object-fit:cover; display:none; }
-        /* 再生を促すオーバーレイ */
+        
+        /* ローディング中に出す文字 */
+        #loading-text { color: var(--cyber-blue); font-size: 0.8rem; letter-spacing: 0.2em; }
+
+        /* 再生オーバーレイ（最初は隠しておく） */
         #play-overlay {
             position:absolute; inset:0; background:rgba(0,0,0,0.9);
-            display:flex; flex-direction:column; justify-content:center; align-items:center;
+            display:none; flex-direction:column; justify-content:center; align-items:center;
             z-index:100; cursor:pointer;
         }
         .btn-play {
-            padding:15px 40px; border:2px solid #00f2ff; color:#00f2ff;
+            padding:15px 40px; border:2px solid var(--cyber-blue); color:var(--cyber-blue);
             background:transparent; font-weight:bold; letter-spacing:0.2em;
             clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.3);
         }
     </style>
 </head>
 <body>
     <div id="stage">
+        <div id="loading-text">CONNECTING TO DATA SERVER...</div>
+
         <div id="play-overlay" onclick="handleStart()">
-            <div class="btn-play">PLAY OPENING</div>
-            <p style="color:#00f2ff; font-size:0.7rem; margin-top:15px;">タップして再生を開始してください</p>
+            <div class="btn-play">START SYSTEM</div>
+            <p style="color:var(--cyber-blue); font-size:0.7rem; margin-top:15px;">タップして再生を開始</p>
         </div>
         
         <video id="v" src="img/opening.mp4" playsinline webkit-playsinline preload="auto"></video>
@@ -34,15 +42,35 @@
     <script>
         const v = document.getElementById('v');
         const overlay = document.getElementById('play-overlay');
+        const loader = document.getElementById('loading-text');
+
+        // 動画の読み込み状態をチェック
+        v.addEventListener('canplaythrough', () => {
+            // 再生準備ができたら「CONNECTING...」を消してボタンを出す
+            loader.style.display = 'none';
+            overlay.style.display = 'flex';
+        });
+
+        // 5秒経っても読み込めない場合、強制的にボタンを出す（予備策）
+        setTimeout(() => {
+            if (overlay.style.display === 'none') {
+                loader.innerText = "DATA READY (FORCE LOAD)";
+                overlay.style.display = 'flex';
+            }
+        }, 5000);
 
         function handleStart() {
-            // ユーザーのタップ直後に再生を実行（これで音付きが許可される）
             v.style.display = 'block';
             overlay.style.display = 'none';
-            v.play().catch(e => {
-                console.error("再生エラー:", e);
-                alert("動画が見つからないか、再生できません。URLを確認してください。");
-            });
+            
+            const playPromise = v.play();
+
+            if (playPromise !== undefined) {
+                playPromise.catch(error => {
+                    console.error("Playback failed:", error);
+                    alert("エラー：動画データへのアクセスが拒否されました。\n\n【確認事項】\n1. img/opening.mp4 が存在するか\n2. ファイル名の大文字小文字が合っているか");
+                });
+            }
         }
 
         v.onended = () => { location.href = 'index.html?mode=after_video'; };
