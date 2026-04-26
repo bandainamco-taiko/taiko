@@ -174,26 +174,31 @@
     }
 
     function handleWindowClick() {
-        const data = scenario[currentStep];
-        if (isTyping) { 
+    const data = scenario[currentStep];
+    if (isTyping) {
             clearInterval(typingTimer); 
             document.getElementById('message-text').innerText = data.text; 
             isTyping = false; 
             waitingForClickInput = true; 
             return; 
+    }
+    
+    if (waitingForClickInput) {
+        waitingForClickInput = false;
+        if (data.input) { showInputUI(data.input); return; }
+        if (data.jump) { saveGame(); window.location.href = data.jump; return; } // ジャンプ前に保存
+        if (data.videoTrigger || data.endingTrigger) { 
+            saveGame(); // 動画に飛ぶ前に保存
+            fader.classList.add('active'); 
+            setTimeout(() => { window.location.href = data.videoTrigger ? "video.html" : "ending.html"; }, 1500); 
+            return; 
         }
         
-        if (waitingForClickInput) {
-            waitingForClickInput = false;
-            if (data.input) { showInputUI(data.input); return; }
-            if (data.jump) { window.location.href = data.jump; return; }
-            if (data.videoTrigger) { fader.classList.add('active'); setTimeout(() => { window.location.href = "video.html"; }, 1500); return; }
-            if (data.endingTrigger) { fader.classList.add('active'); setTimeout(() => { window.location.href = "ending.html"; }, 1500); return; }
-            
-            currentStep++; 
-            showText();
-        }
+        currentStep++; 
+        saveGame(); // 次に進むときに保存
+        showText();
     }
+}
 
     function showInputUI(config) { document.getElementById('input-overlay').style.display = 'flex'; document.getElementById('input-field').value = ""; document.getElementById('input-field').focus(); document.getElementById('input-guide').innerText = config.guide; }
     
@@ -244,30 +249,57 @@
     function closeLog() { document.getElementById('log-screen').style.display = 'none'; }
     function resetGame() { if(confirm("データをリセットしますか？")) { localStorage.removeItem('cyber_puzzle_save'); window.location.href = window.location.pathname; } }
     function toggleMute() { bgm.muted = !bgm.muted; document.getElementById('mute-btn').innerText = bgm.muted ? "🔇" : "🔊"; }
-    function saveGame() { localStorage.setItem('cyber_puzzle_save', JSON.stringify({ step: currentStep, history: chatHistory, notes: unlockedNotes })); }
-    function loadGame() { 
-        const saved = localStorage.getItem('cyber_puzzle_save'); 
-        if (saved) { 
-            const data = JSON.parse(saved); 
-            currentStep = data.step; 
-            chatHistory = data.history || []; 
-            unlockedNotes = data.notes || []; 
-        } 
+    function saveGame() {
+    const saveData = {
+        step: currentStep,
+        history: chatHistory,
+        notes: unlockedNotes
+    };
+    localStorage.setItem('cyber_puzzle_save', JSON.stringify(saveData));
+    console.log("Autosave completed at step:", currentStep); // 動作確認用
+}
+
+function loadGame() {
+    try {
+        const saved = localStorage.getItem('cyber_puzzle_save');
+        if (saved) {
+            const data = JSON.parse(saved);
+            currentStep = data.step || 0;
+            chatHistory = data.history || [];
+            unlockedNotes = data.notes || [];
+            return true; // ロード成功を返す
+        }
+    } catch (e) {
+        console.error("Save data corrupted:", e);
+    }
+    return false;
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const mode = urlParams.get('mode');
+
+    // まずはデータを読み込む
+    const hasSave = loadGame();
+
+    // モード指定がある場合は上書き
+    if (mode === 'after_video') {
+        currentStep = 27;
+        saveGame();
+    } else if (mode === 'after_game') {
+        currentStep = 23;
+        saveGame();
     }
 
-    window.addEventListener('DOMContentLoaded', () => {
-        const urlParams = new URLSearchParams(window.location.search);
-        const mode = urlParams.get('mode');
+    // 保存されたデータがある、もしくは特定のモードから戻った場合はタイトルを飛ばす
+    if (mode || (hasSave && currentStep > 0)) {
+        const titleScreen = document.getElementById('title-screen');
+        if (titleScreen) titleScreen.style.display = 'none';
         
-        if (mode === 'after_video' || mode === 'after_game' || (currentStep > 0 && currentStep < scenario.length)) {
-            document.getElementById('title-screen').remove();
-            document.getElementById('msg-window').style.display = 'block';
-            if (mode === 'after_video') currentStep = 27; 
-            if (mode === 'after_game') currentStep = 23;
-            saveGame();
-            showText();
-        }
-    });
+        document.getElementById('msg-window').style.display = 'block';
+        showText();
+    }
+});
 
     const scenario = [
         { name: "ハルト", text: "「OSAKA。ネオンの海と、牙をむくような技術がひしめき合う、僕の街」", bg: "haikei01", chara: "haruto" },
@@ -353,7 +385,7 @@
         { name: "ハルト", text: "「……っ！ しまった、さっきのドローンだ！ やっぱりあいつの仲間が追ってきてたのか！」", chara: "haruto" },
         { name: "ハルト", text: "「……くそっ、考えるのは後だ. コドウ、行くぞ！ ここから出るんだ！」", chara: "haruto_kodou" },
         { name: "コドウ", text: "「……うん、行こう！」", chara: "kodou" },
-        { name: "ハルト", text: "「……ハァ, はぁ……！ 上手く逃げ出せたぞ」", bg_png: "teien01", chara: "haruto" },
+        { name: "ハルト", text: "「……ハァ, はぁ……！ 上手く逃げ出せたぞ」", bg: "teien01", chara: "haruto" },
         { name: "ハルト", text: "「……っ！？ 嘘だろ, あいつ……. なんでこんなところに……」", chara: "haruto" },
         { name: "ドローン", text: "『……警告. 抵抗を止め、直ちにあの個体を渡せ. データを差し出せば、命までは取らん』", chara: "drone" },
         { name: "謎の男", text: "「断る. ……コドウを, 人殺しの道具には……させない……！」", chara: "kage" },
